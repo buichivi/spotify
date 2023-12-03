@@ -1,0 +1,51 @@
+@import "normalize.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: "Circular Spotify Text", system-ui, sans-serif;
+    }
+    body {
+        width: 100vw;
+        min-height: 100vh;
+    }
+
+    /* scroll bar */
+    body::-webkit-scrollbar {
+        display: none;
+    }
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: hsla(0, 0%, 100%, 0.3);
+    }
+
+    a {
+        text-decoration: none;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+
+.active {
+    color: white;
+}
+
+.search-input:not(:placeholder-shown) + .clear-btn {
+    display: inline-block;
+}
+
+.category-item:nth-child(n + 6) {
+    display: none;
+}
+
+@media screen and (min-width: 1500px) {
+    .category-item:nth-child(n + 6) {
+        display: inline-block;
+    }
+}

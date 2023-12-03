@@ -8,12 +8,10 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 import SearchInput from '~/components/SearchInput';
 import { AUTH_URL, spotifyApi } from '~/config/spotify';
-import useAccessToken from '~/hooks/useAccessToken';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const NavBar = (props, ref) => {
     const location = useLocation();
-    const token = useAccessToken();
     const [user, setUser] = useState({});
 
     useEffect(() => {

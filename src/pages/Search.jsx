@@ -3,21 +3,10 @@ import Category from '~/components/Category';
 import GenreItem from '~/components/GenreItem';
 import HistorySearch from '~/components/HistorySearch';
 import { spotifyApi } from '~/config/spotify';
-import useAccessToken from '~/hooks/useAccessToken';
 
 const Search = () => {
     document.title = 'Spotify - Search';
-    const [userPlaylists, setUserPlaylists] = useState([]);
-    const token = useAccessToken();
-    useEffect(() => {
-        if (token) {
-            spotifyApi.setAccessToken(token);
-            spotifyApi
-                .getMyRecentlyPlayedTracks({ limit: 6 })
-                .then(data => setUserPlaylists(data.body.items));
-        }
-    }, []);
-
+    
     return (
         <div className="px-6">
             <HistorySearch />
@@ -71,11 +60,7 @@ const Search = () => {
                 </div>
             </div>
             <div>
-                <Category
-                    data={userPlaylists.items}
-                    title="Recently played"
-                    className="bg-[#121212]"
-                />
+                
             </div>
         </div>
     );

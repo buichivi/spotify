@@ -23,7 +23,7 @@ const Category = ({ data = [], title, type = 'playlist', to, className }) => {
                     const props =
                         type === 'album'
                             ? {
-                                  to: `/${type}/${item.track?.id}`,
+                                  to: `/${type}/${item.track?.album?.id}`,
                                   name: item.track?.album?.name,
                                   artists: item.track?.album?.artists,
                                   trackImg: item.track?.album?.images[0]?.url,

@@ -7,17 +7,24 @@ import {
 } from '~/components/Icons';
 import { Link, useLocation } from 'react-router-dom';
 import SearchInput from '~/components/SearchInput';
-import { AUTH_URL, spotifyApi } from '~/config/spotify';
+import { AUTH_URL } from '~/config/spotify';
+import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const NavBar = (props, ref) => {
     const location = useLocation();
     const [user, setUser] = useState({});
+    const spotifyApi = useSpotifyApi();
+    console.log('Navbar render');
 
     useEffect(() => {
-            // spotifyApi.setAccessToken(token);
-            spotifyApi.getMe().then(user => setUser(user.body));
-    }, [])
+        console.log("navbar useEffect");
+        if (!spotifyApi.error) {
+            spotifyApi.getMe().then((data) => {
+                setUser(data.body)
+            })
+        }
+    }, [spotifyApi]);
 
     return (
         <nav

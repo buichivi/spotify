@@ -1,33 +1,45 @@
 import { useEffect, useState } from 'react';
 import Category from '~/components/Category';
-import { spotifyApi } from '~/config/spotify';
-// import { spotifyApi } from '~/config/spotify';
+import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const Home = () => {
     document.title = 'Spotify - Web player: Music for everyone';
     const [recommenedPlaylists, setRecommenedPlaylists] = useState([]);
     const [recentAlbums, setRecentAlbums] = useState([]);
+    const spotifyApi = useSpotifyApi();
 
     const removeSimilarSongs = (arr) => {
-        var i = 1;
-        var nextValue = arr[i];
-        const newArr = arr.filter((item) => {
-            const next = { ...nextValue };
-            nextValue = { ...arr[i + 1] };
-            i++;
-            return item?.track?.album?.id != next?.track?.album?.id;
+        const unique = [];
+        const albumIds = [];
+        arr.forEach((item) => {
+            if (!albumIds.includes(item?.track?.album?.id)) {
+                albumIds.push(item?.track?.album?.id);
+                unique.push(item);
+            }
         });
-        return newArr;
+        return unique;
     };
 
     useEffect(() => {
-        spotifyApi.getFeaturedPlaylists().then((res) => {
-            setRecommenedPlaylists(res.body.playlists);
-        });
-        spotifyApi.getMyRecentlyPlayedTracks({ limit: 40 }).then((data) => {
-            setRecentAlbums(data.body.items);
-        });
-    }, []);
+        const loadHomeData = async () => {
+            if (!spotifyApi.error) {
+                const featuredPlaylist =
+                    await spotifyApi.getFeaturedPlaylists();
+                const recentTracks = await spotifyApi.getMyRecentlyPlayedTracks(
+                    { limit: 40 },
+                );
+                setRecommenedPlaylists(featuredPlaylist.body.playlists);
+                setRecentAlbums(recentTracks.body.items);
+            }
+        };
+        loadHomeData();
+        // spotifyApi.getFeaturedPlaylists().then((res) => {
+        //     setRecommenedPlaylists(res.body.playlists);
+        // });
+        // spotifyApi.getMyRecentlyPlayedTracks({ limit: 40 }).then((data) => {
+        //     setRecentAlbums(data.body.items);
+        // });
+    }, [spotifyApi]);
 
     return (
         <div className="w-full">

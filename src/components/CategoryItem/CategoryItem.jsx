@@ -26,24 +26,16 @@ const CategoryItem = ({
             />
             <Link
                 to={to}
-                className="text-normal font-bold pb-1 overflow-hidden no-underline"
-                style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 1,
-                    WebkitBoxOrient: 'vertical',
-                }}
+                className="text-climp-1 text-normal font-bold pb-1 overflow-hidden no-underline"
+                
                 onClick={e => e.stopPropagation()}
             >
                 {name}
             </Link>
             {type === 'album' ? (
                 <div
-                    className="flex whitespace-normal"
-                    style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                    }}
+                    className="text-climp-2 flex whitespace-normal"
+                    
                 >
                     {artists.map((artist, index) => {
                         return (
@@ -69,12 +61,7 @@ const CategoryItem = ({
                 </div>
             ) : (
                 <p
-                    className="text-sm text-[#a7a7a7] leading-[1.35rem] overflow-hidden"
-                    style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                    }}
+                    className="text-climp-2 text-sm text-[#a7a7a7] leading-[1.35rem] overflow-hidden"
                 >
                     {desc}
                 </p>

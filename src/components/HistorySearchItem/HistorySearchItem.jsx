@@ -13,22 +13,14 @@ const HistorySearchItem = ({ name, to, type }) => {
                 alt=""
             />
             <h3
-                className="text-normal font-bold pb-1 overflow-hidden"
-                style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 1,
-                    WebkitBoxOrient: 'vertical',
-                }}
+                className="text-climp-1 text-normal font-bold pb-1 overflow-hidden"
+
             >
                 {name}
             </h3>
             <p
-                className="text-sm text-[#a7a7a7] overflow-hidden"
-                style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 1,
-                    WebkitBoxOrient: 'vertical',
-                }}
+                className="text-climp-1 text-sm text-[#a7a7a7] overflow-hidden"
+
             >
                 {type}
             </p>

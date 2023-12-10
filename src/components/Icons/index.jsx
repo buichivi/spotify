@@ -465,6 +465,41 @@ const VolumeMuteIcon = ({ width = 16, height = 16, className }) => {
     );
 };
 
+const PauseIcon = ({ width = 16, height = 16, className }) => {
+    return (
+        <svg
+            width={width}
+            height={height}
+            fill="currentColor"
+            data-encore-id="icon"
+            role="img"
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className={`Svg-sc-ytk21e-0 kPpCsU ${className}`}
+        >
+            <path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"></path>
+        </svg>
+    );
+};
+
+const MusicIcon = ({ width = 16, height = 16, className }) => {
+    return (
+        <svg
+            width={width}
+            height={height}
+            fill="currentColor"
+            data-encore-id="icon"
+            role="img"
+            aria-hidden="true"
+            data-testid="playlist"
+            className={`Svg-sc-ytk21e-0 iYxpxA ${className}`}
+            viewBox="0 0 24 24"
+        >
+            <path d="M6 3h15v15.167a3.5 3.5 0 1 1-3.5-3.5H19V5H8v13.167a3.5 3.5 0 1 1-3.5-3.5H6V3zm0 13.667H4.5a1.5 1.5 0 1 0 1.5 1.5v-1.5zm13 0h-1.5a1.5 1.5 0 1 0 1.5 1.5v-1.5z"></path>
+        </svg>
+    );
+};
+
 export {
     SpotifyLogo,
     HomeIcon,
@@ -489,4 +524,6 @@ export {
     ReplayIcon,
     VolumnIcon,
     VolumeMuteIcon,
+    PauseIcon,
+    MusicIcon
 };

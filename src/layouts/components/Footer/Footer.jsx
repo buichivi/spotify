@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Player from '~/components/Player';
 import { AUTH_URL } from '~/config/spotify';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
-// import useUser from '~/hooks/useUser';
 
 const track = {
     name: '',
@@ -21,6 +20,7 @@ const Footer = () => {
     const [is_active, setActive] = useState(false);
     const [player, setPlayer] = useState(undefined);
     const [current_track, setTrack] = useState(track);
+    const [state, setState] = useState({});
 
     console.log('Footer re-render');
 
@@ -62,7 +62,7 @@ const Footer = () => {
                     if (!state) {
                         return;
                     }
-
+                    setState(state)
                     setTrack(state.track_window.current_track);
                     setPaused(state.paused);
 
@@ -88,7 +88,7 @@ const Footer = () => {
         <>
             {Object.keys(user).length > 0 ? (
                 <Player
-                    data={{ is_active, player, is_paused, current_track }}
+                    data={{ is_active, player, is_paused, current_track, state }}
                 />
             ) : (
                 <a

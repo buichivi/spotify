@@ -30,16 +30,6 @@ const SpotifyProvider = ({ children }) => {
                 }
             });
         }
-
-        // get new access_token every 50 minutes
-        // const timerId = setInterval(() => {
-        //     const refresh_token = spotifyApi.getRefreshToken();
-        //     getNewToken(refresh_token).then((data) => {
-        //         localStorage.setItem('access_token', data.access_token);
-        //         spotifyApi.setAccessToken(data.access_token);
-        //     });
-        // }, 3000000);
-        // return () => clearInterval(timerId);
     }, []);
 
     return (

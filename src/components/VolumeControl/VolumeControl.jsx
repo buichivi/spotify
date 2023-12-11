@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { VolumeMuteIcon, VolumnIcon } from '../Icons';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const VolumeControl = ({ player }) => {
     const initVolume = JSON.parse(localStorage.getItem('volume_percent'));
-    console.log(initVolume);
     const [volume, setVolume] = useState(initVolume || 100);
     const volumeBar = useRef();
     // const spotifyApi = useSpotifyApi();

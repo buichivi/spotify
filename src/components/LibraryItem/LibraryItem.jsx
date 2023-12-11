@@ -1,14 +1,17 @@
+import { Link } from "react-router-dom";
 import { MusicIcon } from "../Icons";
 
 const LibraryItem = ({ data }) => {
     return (
-        <div className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between">
-            <div className="w-12 h-12 flex-shrink-0 rounded-md overflow-hidden">
+        <Link className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between"
+            to={`/${data?.type}/${data.id}`}
+        >
+            <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
                 {data.images.length > 0 ? (
                     <img
                         src={data?.images[0]?.url}
                         alt=""
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${data?.type == 'artist' ? 'rounded-full' : 'rounded-md'}`}
                     />
                 ) : (
                     <div className="w-full h-full bg-[#282828] flex items-center justify-center">
@@ -24,7 +27,7 @@ const LibraryItem = ({ data }) => {
                     {data?.type}
                 </span>
             </div>
-        </div>
+        </Link>
     );
 };
 

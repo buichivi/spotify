@@ -8,7 +8,7 @@ import useSpotifyApi from '~/hooks/useSpotifyApi';
 const LeftSide = () => {
     const shadow = useRef();
     const [user, setUser] = useState({});
-    const [library, setLibrary] = useState([]);
+    const [library, setLibrary] = useState({});
     const spotifyApi = useSpotifyApi();
 
     const handleScroll = (e) => {
@@ -16,14 +16,32 @@ const LeftSide = () => {
         else shadow.current.style.display = 'none';
     };
 
+    console.log(Object.entries(library));
+
     useEffect(() => {
-        if (!spotifyApi.error) {
-            spotifyApi.getMe().then((data) => {
-                setUser(data.body);
+        const loadLibrary = async () => {
+            const user = await spotifyApi.getMe();
+            setUser(user.body);
+            const playlists = await spotifyApi.getUserPlaylists();
+            setLibrary((prev) => ({
+                ...prev,
+                playlists: playlists.body.items,
+            }));
+            const artists = await spotifyApi.getFollowedArtists({
+                limit: 50,
             });
-            spotifyApi
-                .getUserPlaylists()
-                .then((data) => setLibrary(data.body.items));
+            setLibrary((prev) => ({
+                ...prev,
+                artists: artists.body.artists.items,
+            }))
+            const albums = await spotifyApi.getMySavedAlbums()
+            setLibrary((prev) => ({
+                ...prev,
+                albums: albums.body.items,
+            }))
+        };
+        if (!spotifyApi.error) {
+            loadLibrary();
         }
     }, [spotifyApi]);
 
@@ -91,13 +109,24 @@ const LeftSide = () => {
                                 </>
                             ) : (
                                 <div className="w-full h-full">
-                                    {library.map((item, index) => {
-                                        return (
-                                            <div key={index} className='w-full h-auto'>
-                                                <LibraryItem data={item}/>
-                                            </div>
-                                        );
-                                    })}
+                                    {Object.entries(library).map(
+                                        (libraryItem) => {
+                                            return libraryItem[1]?.map(
+                                                (item, index) => {
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="w-full h-auto"
+                                                        >
+                                                            <LibraryItem
+                                                                data={libraryItem[0] == 'albums' ? item.album : item}
+                                                            />
+                                                        </div>
+                                                    );
+                                                },
+                                            );
+                                        },
+                                    )}
                                 </div>
                             )}
                         </div>

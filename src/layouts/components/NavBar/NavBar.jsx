@@ -44,7 +44,7 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                 location.pathname.includes('/album') ||
                 location.pathname.includes('/playlist')) && (
                 <div
-                    className="flex-1 flex-shrink-0 flex items-center gap-2 transition"
+                    className="flex-1 flex-shrink-0 flex items-center gap-2 transition duration-500"
                     style={{
                         opacity: isHide == true ? '0' : '1',
                         pointerEvents: isHide == true ? 'none' : 'all',

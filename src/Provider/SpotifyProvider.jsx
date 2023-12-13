@@ -11,11 +11,6 @@ const SpotifyProvider = ({ children }) => {
     const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refresh_token'));
 
-    // const initAccessToken = localStorage.getItem('access_token');
-    // const initRefreshToken = localStorage.getItem('refresh_token');
-    // initAccessToken && spotifyApi.setAccessToken(initAccessToken);
-    // initRefreshToken && spotifyApi.setRefreshToken(initRefreshToken);
-
     useEffect(() => {
         console.log('Spofify Provider useEffect()');
         const code = new URLSearchParams(window.location.search).get('code');

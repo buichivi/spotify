@@ -11,6 +11,7 @@ const RightSide = ({ children }) => {
     const [isHidePlayBtn, setIsHidePlayBtn] = useState(true);
     const [navColor, setNavColor] = useState('');
     const [isMainContent, setIsMainContent] = useState(false);
+    const [contentName, setContentName] = useState('');
     const nav = useRef();
     const spotifyApi = useSpotifyApi();
 
@@ -28,9 +29,10 @@ const RightSide = ({ children }) => {
             var contentID;
             if (location.pathname.includes('/artist')) {
                 contentID = location.pathname.split('/artist/')[1];
-                const content = await spotifyApi.getArtist(contentID);
+                const artist = await spotifyApi.getArtist(contentID);
+                setContentName(artist.body.name);
                 const color = await Vibrant.from(
-                    content.body.images[0].url,
+                    artist.body.images[0].url,
                 ).getPalette();
                 setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/album')) {
@@ -39,13 +41,17 @@ const RightSide = ({ children }) => {
                 contentID = location.pathname.split('/playlist/')[1];
             }
         };
-        if (spotifyApi.getAccessToken()) {
+        if (!spotifyApi.error) {
             getNavColor();
         }
-    }, [location]);
+    }, [location, spotifyApi]);
     return (
         <>
-            <NavBar ref={nav} isHide={isHidePlayBtn} />
+            <NavBar
+                ref={nav}
+                isHide={isHidePlayBtn}
+                currentContent={contentName}
+            />
             <div
                 className="h-full overflow-auto"
                 onScroll={(e) => {

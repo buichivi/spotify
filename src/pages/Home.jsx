@@ -32,13 +32,9 @@ const Home = () => {
                 setRecentAlbums(recentTracks.body.items);
             }
         };
-        loadHomeData();
-        // spotifyApi.getFeaturedPlaylists().then((res) => {
-        //     setRecommenedPlaylists(res.body.playlists);
-        // });
-        // spotifyApi.getMyRecentlyPlayedTracks({ limit: 40 }).then((data) => {
-        //     setRecentAlbums(data.body.items);
-        // });
+        if (!spotifyApi.error) {
+            loadHomeData();
+        }
     }, [spotifyApi]);
 
     return (

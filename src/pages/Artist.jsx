@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 import Vibrant from 'node-vibrant';
 import { PlayIcon, VerifyIcon } from '~/components/Icons';
+import SongItem from '~/components/SongItem';
 
 const Artist = () => {
     const { id } = useParams();
     const [artist, setArtist] = useState({});
+    const [topTracks, setTopTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
     const spotifyApi = useSpotifyApi();
 
@@ -19,8 +21,14 @@ const Artist = () => {
             setMainColor(color.DarkVibrant.getHex());
             setArtist(artist.body);
         };
+
+        const GetTopTracks = async () => {
+            const topTracks = await spotifyApi.getArtistTopTracks(id, 'VN');
+            setTopTracks(topTracks.body.tracks);
+        };
         if (spotifyApi.getAccessToken()) {
             getArtist();
+            GetTopTracks();
         }
     }, [spotifyApi, id]);
 
@@ -67,7 +75,7 @@ const Artist = () => {
                 </div>
             </div>
             <div
-                className="h-[100vh] bg-gradient-to-b from-[#121212] from-[200px] to-[#121212 to-[200px] opacity-90 sticky top-0"
+                className="h-auto bg-gradient-to-b from-[#121212] from-[200px] to-[#121212 to-[200px] opacity-90 sticky top-0"
                 style={{
                     '--tw-gradient-from': mainColor,
                 }}
@@ -77,7 +85,25 @@ const Artist = () => {
                         <PlayIcon />
                     </button>
                     <button className="w-fit ring-1 hover:ring-2 hover:scale-105 ring-white transition rounded-full  py-[3px] px-[15px] cursor-pointer text-sm">
-                        <span className='relative top-[2px]'>Follow</span>
+                        <span className="relative top-[2px]">Follow</span>
+                    </button>
+                </div>
+                <div className="px-6">
+                    <h3 className="text-2xl mb-4 font-bold">Popular</h3>
+                    <div className='w-full'>
+                        {topTracks.map((track, index) => {
+                            return (
+                                <div key={index} className="top-track-limit-5">
+                                    <SongItem
+                                        orderNum={index + 1}
+                                        trackData={track}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <button className='p-4 text-sm text-[#a7a7a7] cursor-default hover:text-white transition'>
+                        <span>See more</span>
                     </button>
                 </div>
             </div>

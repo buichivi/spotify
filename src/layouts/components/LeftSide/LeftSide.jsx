@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { LanguageIcon, LibraryIcon, PlusIcon } from '~/components/Icons';
 import LibraryItem from '~/components/LibraryItem';
@@ -15,8 +16,6 @@ const LeftSide = () => {
         if (e.target.scrollTop) shadow.current.style.display = 'block';
         else shadow.current.style.display = 'none';
     };
-
-    console.log(Object.entries(library));
 
     useEffect(() => {
         const loadLibrary = async () => {

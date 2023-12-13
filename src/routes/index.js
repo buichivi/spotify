@@ -10,7 +10,7 @@ const publicRoutes = [
         element: Search
     },
     {
-        path: '/artist',
+        path: '/artist/:id',
         element: Artist
     },
     {

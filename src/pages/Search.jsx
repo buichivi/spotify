@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react';
-import Category from '~/components/Category';
 import GenreItem from '~/components/GenreItem';
 import HistorySearch from '~/components/HistorySearch';
-import { spotifyApi } from '~/config/spotify';
 
 const Search = () => {
     document.title = 'Spotify - Search';

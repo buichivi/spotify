@@ -20,6 +20,17 @@ export default {
             flex: {
                 364: '0 1 364px',
             },
+            animation: {
+                slide: 'slideUpAndDown .5s cubic-bezier(0.9, -0.13, 0, 0.38) infinite alternate-reverse',
+            },
+            keyframes: {
+                slideUpAndDown: {
+                    '0%': { bottom: '-10%' },
+                    '33%': { bottom: '-33%' },
+                    '66%': { bottom: '-66%' },
+                    '100%': { bottom: '-100%' },
+                },
+            },
         },
     },
     plugins: [],

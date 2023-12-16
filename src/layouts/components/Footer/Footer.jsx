@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Player from '~/components/Player';
 import { AUTH_URL } from '~/config/spotify';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
@@ -24,6 +23,24 @@ const Footer = () => {
 
     console.log('Footer re-render');
 
+    // useEffect(() => {
+    //     if (!spotifyApi.error) {
+    //         spotifyApi
+    //             .play({
+    //                 device_id: [device_id],
+    //                 context_uri: 'spotify:album:5ht7ItJgpBH7W6vJ5BqpPr',
+    //                 offset: {
+    //                     position: 5,
+    //                 },
+    //                 position_ms: 0,
+    //             })
+    //             .then((res) => {
+    //                 console.log(res.body);
+    //             })
+    //             .catch((err) => console.log(err));
+    //     }
+    // }, [spotifyApi]);
+
     useEffect(() => {
         if (!spotifyApi.error) {
             const script = document.createElement('script');
@@ -32,7 +49,7 @@ const Footer = () => {
             document.body.appendChild(script);
 
             window.onSpotifyWebPlaybackSDKReady = () => {
-                const access_token = spotifyApi.getAccessToken();   
+                const access_token = spotifyApi.getAccessToken();
                 const player = new window.Spotify.Player({
                     name: 'Web Playback SDK',
                     getOAuthToken: (cb) => {
@@ -51,6 +68,21 @@ const Footer = () => {
                                 true,
                             );
                         });
+                        spotifyApi
+                            .play({
+                                device_id: [device_id],
+                                context_uri:
+                                    'spotify:album:5ht7ItJgpBH7W6vJ5BqpPr',
+                                offset: {
+                                    position: 5,
+                                },
+                                position_ms: 0,
+                            })
+                            .then((res) => {
+                                console.log('The song is loaded!');
+                                console.log(res.body);
+                            })
+                            .catch((err) => console.log(err));
                     }
                 });
 
@@ -62,7 +94,7 @@ const Footer = () => {
                     if (!state) {
                         return;
                     }
-                    setState(state)
+                    setState(state);
                     setTrack(state.track_window.current_track);
                     setPaused(state.paused);
 
@@ -88,7 +120,13 @@ const Footer = () => {
         <>
             {Object.keys(user).length > 0 ? (
                 <Player
-                    data={{ is_active, player, is_paused, current_track, state }}
+                    data={{
+                        is_active,
+                        player,
+                        is_paused,
+                        current_track,
+                        state,
+                    }}
                 />
             ) : (
                 <a

@@ -20,8 +20,8 @@ function Player({ data }) {
             {!is_active && <h3>Loading...</h3>}
             {is_active && (
                 <div className="w-full h-full flex items-center justify-between relative">
-                    <div className="flex-1 flex items-center">
-                        <div className="w-14 h-14 rounded-md overflow-hidden">
+                    <div className="flex-1 flex-shrink-0 flex items-center">
+                        <div className="w-14 h-14 flex-shrink-0 rounded-md overflow-hidden">
                             <img
                                 src={current_track?.album?.images[0]?.url}
                                 alt=""
@@ -33,7 +33,7 @@ function Player({ data }) {
                                 to={`/album/${
                                     current_track?.album?.uri?.split(':')[2]
                                 }`}
-                                className="text-sm text-white hover:underline"
+                                className="text-climp-1 text-sm text-white hover:underline"
                             >
                                 {current_track?.name}
                             </Link>

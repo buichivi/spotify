@@ -53,7 +53,7 @@ const RightSide = ({ children }) => {
                 currentContent={contentName}
             />
             <div
-                className="h-full overflow-auto"
+                className="h-full overflow-y-auto overflow-x-hidden"
                 onScroll={(e) => {
                     let scrollTop = 0;
                     if (isMainContent) {

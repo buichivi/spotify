@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { PlaybackContext } from '~/Provider/PlaybackProvider';
 import { LanguageIcon, LibraryIcon, PlusIcon } from '~/components/Icons';
 import LibraryItem from '~/components/LibraryItem';
 import Menu from '~/components/Menu';
@@ -10,12 +10,15 @@ const LeftSide = () => {
     const shadow = useRef();
     const [user, setUser] = useState({});
     const [library, setLibrary] = useState({});
+    const { playbackState } = useContext(PlaybackContext)
     const spotifyApi = useSpotifyApi();
 
     const handleScroll = (e) => {
         if (e.target.scrollTop) shadow.current.style.display = 'block';
         else shadow.current.style.display = 'none';
     };
+
+    console.log(playbackState);
 
     useEffect(() => {
         const loadLibrary = async () => {
@@ -32,17 +35,18 @@ const LeftSide = () => {
             setLibrary((prev) => ({
                 ...prev,
                 artists: artists.body.artists.items,
-            }))
-            const albums = await spotifyApi.getMySavedAlbums()
+            }));
+            const albums = await spotifyApi.getMySavedAlbums();
             setLibrary((prev) => ({
                 ...prev,
                 albums: albums.body.items,
-            }))
+            }));
         };
         if (!spotifyApi.error) {
             loadLibrary();
         }
     }, [spotifyApi]);
+
 
     return (
         <>
@@ -118,7 +122,13 @@ const LeftSide = () => {
                                                             className="w-full h-auto"
                                                         >
                                                             <LibraryItem
-                                                                data={libraryItem[0] == 'albums' ? item.album : item}
+                                                                data={
+                                                                    libraryItem[0] ==
+                                                                    'albums'
+                                                                        ? item.album
+                                                                        : item
+                                                                }
+                                                                playbackState={playbackState}
                                                             />
                                                         </div>
                                                     );

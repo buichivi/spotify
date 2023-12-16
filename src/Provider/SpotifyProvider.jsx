@@ -1,15 +1,16 @@
 import { createContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { spotifyApi } from '~/config/spotify';
-import getNewToken from '~/services/getNewToken';
 import getToken from '~/services/getToken';
 
 export const SpotifyContext = createContext();
 
 const SpotifyProvider = ({ children }) => {
     console.log('App re-render');
-    const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
-    const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refresh_token'));
+    const [accessToken, setAccessToken] = useState(
+        localStorage.getItem('access_token'),
+    );
+    const [refreshToken, setRefreshToken] = useState(
+        localStorage.getItem('refresh_token'),
+    );
 
     useEffect(() => {
         console.log('Spofify Provider useEffect()');

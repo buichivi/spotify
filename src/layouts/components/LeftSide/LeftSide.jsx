@@ -10,15 +10,13 @@ const LeftSide = () => {
     const shadow = useRef();
     const [user, setUser] = useState({});
     const [library, setLibrary] = useState({});
-    const { playbackState } = useContext(PlaybackContext)
+    const { songState } = useContext(PlaybackContext)
     const spotifyApi = useSpotifyApi();
 
     const handleScroll = (e) => {
         if (e.target.scrollTop) shadow.current.style.display = 'block';
         else shadow.current.style.display = 'none';
     };
-
-    console.log(playbackState);
 
     useEffect(() => {
         const loadLibrary = async () => {
@@ -128,7 +126,7 @@ const LeftSide = () => {
                                                                         ? item.album
                                                                         : item
                                                                 }
-                                                                playbackState={playbackState}
+                                                                isPlay={songState.artistIds.includes(item.id)}
                                                             />
                                                         </div>
                                                     );

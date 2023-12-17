@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { durationConvert } from '~/utils/durationConvert';
 
 const PlaybackTracker = ({ player, state }) => {
     const tracker = useRef();
     const max = Math.floor(state.duration / 1000);
     const [position, setPosition] = useState(Math.floor(state.position / 1000));
     const [isSeeking, setIsSeeking] = useState(false);
-    const [currentSongID, setCurrentSongID] = useState(state.playback_id);
-
-    const getTrackTime = (time_ms) => {
-        const time_s = Math.floor(time_ms / 1000);
-        const minute = Math.floor(time_s / 60);
-        const second = time_s - minute * 60;
-        return minute + ':' + (second - 10 < 0 ? '0' + second : second);
-    };
+    const [currentSongID, setCurrentSongID] = useState(state?.track_window?.current_track?.id);
 
     console.log('Playback Tracker re-render');
 
@@ -22,10 +16,9 @@ const PlaybackTracker = ({ player, state }) => {
     }, [position]);
 
     useEffect(() => {
-        // setTimestamp(state.timestamp)
-        if (currentSongID != state.playback_id) {
+        if (currentSongID != state.track_window.current_track.id) {
             setPosition(0);
-            setCurrentSongID(state.playback_id);
+            setCurrentSongID(state.track_window.current_track.id);
         }
         var timer;
         if (!state.paused) {
@@ -44,7 +37,7 @@ const PlaybackTracker = ({ player, state }) => {
     return (
         <div className="w-full flex items-center justify-between gap-2">
             <span className="w-6 flex-shrink-0 text-[11px] text-[#a7a7a7]">
-                {getTrackTime(position * 1000)}
+                {durationConvert(position * 1000)}
             </span>
             <input
                 type="range"
@@ -67,7 +60,7 @@ const PlaybackTracker = ({ player, state }) => {
                 value={position}
             />
             <span className="w-6 flex-shrink-0 text-[11px] text-[#a7a7a7]">
-                {getTrackTime(state.duration)}
+                {durationConvert(state.duration)}
             </span>
         </div>
     );

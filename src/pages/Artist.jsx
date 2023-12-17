@@ -13,6 +13,10 @@ const Artist = () => {
     const [isFollow, setIsFollow] = useState(false);
     const songItems = useRef([]);
     const spotifyApi = useSpotifyApi();
+    const context = topTracks.map((track) => {
+        return track?.uri
+    })
+
 
     useEffect(() => {
         const getArtist = async () => {
@@ -26,14 +30,15 @@ const Artist = () => {
             setIsFollow(isFolllow);
         };
 
-        const GetTopTracks = async () => {
+        const getTopTracks = async () => {
             const topTracks = await spotifyApi.getArtistTopTracks(id, 'VN');
             setTopTracks(topTracks.body.tracks);
         };
         if (spotifyApi.getAccessToken()) {
             getArtist();
-            GetTopTracks();
+            getTopTracks();
         }
+
     }, [spotifyApi, id]);
 
     return (
@@ -126,6 +131,7 @@ const Artist = () => {
                                     <SongItem
                                         orderNum={index + 1}
                                         trackData={track}
+                                        context={context}
                                     />
                                 </div>
                             );

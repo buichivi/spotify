@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MusicIcon } from '../Icons';
 
-const LibraryItem = ({ data, playbackState }) => {
+const LibraryItem = ({ data, isPlay }) => {
     return (
         <Link
             className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between"
@@ -32,12 +32,7 @@ const LibraryItem = ({ data, playbackState }) => {
                 <h4
                     className="text-climp-1 text-[#f5f5f5] font-normal"
                     style={{
-                        color:
-                            playbackState?.item?.artists.length > 0 &&
-                            playbackState?.item?.artists.some((artist) => {
-                                return artist.id === data.id;
-                            }) &&
-                            '#1db954',
+                        color: isPlay && '#1db954',
                     }}
                 >
                     {data?.name}

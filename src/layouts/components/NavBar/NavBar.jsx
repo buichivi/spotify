@@ -50,10 +50,10 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                         pointerEvents: isHide == true ? 'none' : 'all',
                     }}
                 >
-                    <button className="w-[48px] h-[48px] bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition">
+                    <button className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition">
                         <PlayIcon />
                     </button>
-                    <span className="text-2xl font-bold">{currentContent}</span>
+                    <span className="text-climp-1 text-2xl font-bold">{currentContent}</span>
                 </div>
             )}
             {location.pathname.includes('/search') && <SearchInput />}
@@ -90,12 +90,20 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                         <a
                             href={AUTH_URL}
                             className="flex items-center justify-center cursor-pointer font-bold text-[#848484] p-2 hover:scale-105 hover:text-white bg-transparent transition"
+                            onClick={() => {
+                                localStorage.removeItem('access_token')
+                                localStorage.removeItem('refresh_token')
+                            }}
                         >
                             Sign up
                         </a>
                         <a
                             href={AUTH_URL}
                             className="flex items-center justify-center cursor-pointer py-2 px-8 h-12 rounded-full bg-white text-black font-bold hover:scale-105 transition"
+                            onClick={() => {
+                                localStorage.removeItem('access_token')
+                                localStorage.removeItem('refresh_token')
+                            }}
                         >
                             Log in
                         </a>
@@ -110,7 +118,7 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                         className="py-1 pr-4 pl-[33px] h-8 bg-[#0000008a] cursor-pointer rounded-full relative hidden md:flex items-center justify-center"
                     >
                         <ArrowDownIcon className="absolute top-1/2 left-2 -translate-y-1/2" />
-                        <span className="text-white text-sm font-bold relative top-[1px]">
+                        <span className="text-climp-1 text-white text-sm font-bold relative top-[1px]">
                             Install App
                         </span>
                     </a>

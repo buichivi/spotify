@@ -14,7 +14,6 @@ import { spotifyApi } from '~/config/spotify';
 function Player({ data }) {
     const { player, is_active, is_paused, current_track, state } = data;
     console.log('Player re-render');
-
     return (
         <>
             {!is_active && <h3>Loading...</h3>}

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { PlaybackContext } from '~/Provider/PlaybackProvider';
 import Player from '~/components/Player';
 import { AUTH_URL } from '~/config/spotify';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
@@ -14,6 +15,7 @@ const track = {
 const Footer = () => {
     const [user, setUser] = useState({});
     const spotifyApi = useSpotifyApi();
+    const { dispatchSongState } = useContext(PlaybackContext);
 
     const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
@@ -22,24 +24,6 @@ const Footer = () => {
     const [state, setState] = useState({});
 
     console.log('Footer re-render');
-
-    // useEffect(() => {
-    //     if (!spotifyApi.error) {
-    //         spotifyApi
-    //             .play({
-    //                 device_id: [device_id],
-    //                 context_uri: 'spotify:album:5ht7ItJgpBH7W6vJ5BqpPr',
-    //                 offset: {
-    //                     position: 5,
-    //                 },
-    //                 position_ms: 0,
-    //             })
-    //             .then((res) => {
-    //                 console.log(res.body);
-    //             })
-    //             .catch((err) => console.log(err));
-    //     }
-    // }, [spotifyApi]);
 
     useEffect(() => {
         if (!spotifyApi.error) {
@@ -62,27 +46,8 @@ const Footer = () => {
 
                 player.addListener('ready', ({ device_id }) => {
                     if (device_id) {
-                        spotifyApi.getMyDevices().then((data) => {
-                            spotifyApi.transferMyPlayback(
-                                [data.body.devices[0].id],
-                                true,
-                            );
-                        });
-                        spotifyApi
-                            .play({
-                                device_id: [device_id],
-                                context_uri:
-                                    'spotify:album:5ht7ItJgpBH7W6vJ5BqpPr',
-                                offset: {
-                                    position: 5,
-                                },
-                                position_ms: 0,
-                            })
-                            .then((res) => {
-                                console.log('The song is loaded!');
-                                console.log(res.body);
-                            })
-                            .catch((err) => console.log(err));
+                        spotifyApi.transferMyPlayback([device_id], true);
+                        dispatchSongState({ type: 'SETDEVICE', payLoad: device_id })
                     }
                 });
 
@@ -94,6 +59,18 @@ const Footer = () => {
                     if (!state) {
                         return;
                     }
+                    dispatchSongState({
+                        type: 'UPDATE_SONG_STATE',
+                        payLoad: {
+                            songId: state?.track_window?.current_track?.id,
+                            albumId: state?.track_window?.current_track?.album?.uri.split(':')[2],
+                            artistIds: state?.track_window?.current_track?.artists?.map((artist) => artist?.uri.split(':')[2]),
+                            uri:  state?.track_window?.current_track?.uri,
+                            isPlaying: !state?.paused,
+                            duration: state?.duration,
+                            position: state?.position
+                        },
+                    });
                     setState(state);
                     setTrack(state.track_window.current_track);
                     setPaused(state.paused);

@@ -1,27 +1,17 @@
-import { createContext, useEffect, useState } from 'react';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { createContext, useReducer } from 'react';
+import { initSongState, songReducer } from '~/reducer/songReducer';
 
 const PlaybackContext = createContext();
 const PlaybackProvider = ({ children }) => {
-    const spotifyApi = useSpotifyApi();
-    const [playbackState, setPlaybackState] = useState();
-    const [player, setPlayer] = useState();
+    const [songState, dispatchSongState] = useReducer(
+        songReducer,
+        initSongState,
+    );
 
-    useEffect(() => {
-        const getPlayer = async () => {
-            const playbackState = await spotifyApi.getMyCurrentPlaybackState();
-            setPlaybackState(playbackState.body);
-            const deviceIds = await spotifyApi.getMyDevices()
-            console.log(deviceIds.body);
-            
-        };
-        if (!spotifyApi.error) {
-            getPlayer();
-        }
-    }, [spotifyApi]);
+    console.log(songState);
 
     return (
-        <PlaybackContext.Provider value={{ playbackState }}>
+        <PlaybackContext.Provider value={{ songState, dispatchSongState }}>
             {children}
         </PlaybackContext.Provider>
     );

@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: 'Circular Spotify Text';
+    src: url('./assets/fonts/CircularSpotifyText-Medium.otf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Circular Spotify Text';
+    src: url('./assets/fonts/CircularSpotifyText-Light.otf');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'Circular Spotify Text';
+    src: url('./assets/fonts/CircularSpotifyText-Bold.otf');
+    font-weight: 600;
+}
+
 @layer base {
     html {
         font-family: 'Circular Spotify Text', system-ui, sans-serif;

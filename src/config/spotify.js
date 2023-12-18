@@ -25,9 +25,11 @@ AUTH_URL += '&scope=' + encodeURIComponent(scopes);
 AUTH_URL += '&redirect_uri=' + encodeURIComponent(window.location.origin);
 
 const spotifyApi = new SpotifyWebApi({
-	clientId: import.meta.env.SPOTIFY_CLIENT_ID,
-	clientSecret: import.meta.env.SPOTIFY_CLIENT_SECRET,
+	clientId: import.meta.env.VITE_SPOTIFY_CLIENT_ID,
+	clientSecret: import.meta.env.VITE_SPOTIFY_CLIENT_SECRET,
 	redirectUri: window.location.origin
 })
+
+console.log(import.meta.env.VITE_SPOTIFY_CLIENT_ID);
 
 export { spotifyApi, scopes, AUTH_ENDPOINT, AUTH_URL }

@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-import { PlaybackContext } from '~/Provider/PlaybackProvider';
+import { useEffect, useState } from 'react';
 import Player from '~/components/Player';
 import { AUTH_URL } from '~/config/spotify';
+import useSongReducer from '~/hooks/useSongReducer';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const track = {
@@ -15,7 +15,7 @@ const track = {
 const Footer = () => {
     const [user, setUser] = useState({});
     const spotifyApi = useSpotifyApi();
-    const { dispatchSongState } = useContext(PlaybackContext);
+    const { dispatchSongState } = useSongReducer();
 
     const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
@@ -47,7 +47,10 @@ const Footer = () => {
                 player.addListener('ready', ({ device_id }) => {
                     if (device_id) {
                         spotifyApi.transferMyPlayback([device_id], true);
-                        dispatchSongState({ type: 'SETDEVICE', payLoad: device_id })
+                        dispatchSongState({
+                            type: 'SET_DEVICE',
+                            payLoad: device_id,
+                        });
                     }
                 });
 
@@ -63,12 +66,18 @@ const Footer = () => {
                         type: 'UPDATE_SONG_STATE',
                         payLoad: {
                             songId: state?.track_window?.current_track?.id,
-                            albumId: state?.track_window?.current_track?.album?.uri.split(':')[2],
-                            artistIds: state?.track_window?.current_track?.artists?.map((artist) => artist?.uri.split(':')[2]),
-                            uri:  state?.track_window?.current_track?.uri,
+                            albumId:
+                                state?.track_window?.current_track?.album?.uri.split(
+                                    ':',
+                                )[2],
+                            artistIds:
+                                state?.track_window?.current_track?.artists?.map(
+                                    (artist) => artist?.uri.split(':')[2],
+                                ),
+                            uri: state?.track_window?.current_track?.uri,
                             isPlaying: !state?.paused,
                             duration: state?.duration,
-                            position: state?.position
+                            position: state?.position,
                         },
                     });
                     setState(state);

@@ -10,9 +10,11 @@ import {
 import VolumeControl from '../VolumeControl';
 import PlaybackTracker from '../PlaybackTracker';
 import { spotifyApi } from '~/config/spotify';
+import useSongReducer from '~/hooks/useSongReducer';
 
 function Player({ data }) {
     const { player, is_active, is_paused, current_track, state } = data;
+    const { songState } = useSongReducer();
     console.log('Player re-render');
     return (
         <>
@@ -36,10 +38,7 @@ function Player({ data }) {
                             >
                                 {current_track?.name}
                             </Link>
-                            <div
-                                className="text-climp-2 flex whitespace-normal"
-
-                            >
+                            <div className="text-climp-2 flex whitespace-normal">
                                 {current_track?.artists.map((artist, index) => {
                                     return (
                                         <Link
@@ -87,7 +86,16 @@ function Player({ data }) {
                             </button>
                             <button
                                 className="w-8 h-8 flex-shrink-0 flex items-center cursor-default mx-[7px] justify-center bg-white rounded-full text-black hover:scale-105 transition"
-                                onClick={() => player.togglePlay()}
+                                onClick={() => {
+                                    player.togglePlay();
+                                    if (is_paused) {
+                                        player
+                                            .seek(songState.position)
+                                            .then(() => {
+                                                console.log('Updated position');
+                                            });
+                                    }
+                                }}
                             >
                                 {is_paused ? (
                                     <PlayIcon width={18} height={18} />
@@ -131,10 +139,10 @@ function Player({ data }) {
                                 )}
                             </button>
                         </div>
-                        <PlaybackTracker player={player} state={state} />
+                        <PlaybackTracker player={player} />
                     </div>
-                    <div className='flex-1 flex-shrink-0'>
-                        <VolumeControl player={player}/>
+                    <div className="flex-1 flex-shrink-0">
+                        <VolumeControl player={player} />
                     </div>
                 </div>
             )}

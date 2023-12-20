@@ -11,7 +11,7 @@ const RightSide = ({ children }) => {
     const [isHidePlayBtn, setIsHidePlayBtn] = useState(true);
     const [navColor, setNavColor] = useState('');
     const [isMainContent, setIsMainContent] = useState(false);
-    const [contentName, setContentName] = useState('');
+    const [content, setContent] = useState('');
     const nav = useRef();
     const spotifyApi = useSpotifyApi();
 
@@ -30,7 +30,7 @@ const RightSide = ({ children }) => {
             if (location.pathname.includes('/artist')) {
                 contentID = location.pathname.split('/artist/')[1];
                 const artist = await spotifyApi.getArtist(contentID);
-                setContentName(artist.body.name);
+                setContent(artist.body);
                 const color = await Vibrant.from(
                     artist.body.images[0].url,
                 ).getPalette();
@@ -47,11 +47,7 @@ const RightSide = ({ children }) => {
     }, [location, spotifyApi]);
     return (
         <>
-            <NavBar
-                ref={nav}
-                isHide={isHidePlayBtn}
-                currentContent={contentName}
-            />
+            <NavBar ref={nav} isHide={isHidePlayBtn} currentContent={content} />
             <div
                 className="h-full overflow-y-auto overflow-x-hidden"
                 onScroll={(e) => {

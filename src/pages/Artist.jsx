@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 import Vibrant from 'node-vibrant';
-import { PlayIcon, VerifyIcon } from '~/components/Icons';
+import { PauseIcon, PlayIcon, VerifyIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
+import useSongReducer from '~/hooks/useSongReducer';
 
 const Artist = () => {
     const { id } = useParams();
+    const { songState, dispatchSongState } = useSongReducer();
     const [artist, setArtist] = useState({});
     const [topTracks, setTopTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
@@ -14,9 +16,41 @@ const Artist = () => {
     const songItems = useRef([]);
     const spotifyApi = useSpotifyApi();
     const context = topTracks.map((track) => {
-        return track?.uri
-    })
+        return track?.uri;
+    });
 
+    const handlePlayAndResume = async () => {
+        const idx = context.indexOf(songState.uri);
+        const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
+
+        spotifyApi
+            .play({
+                device_id: songState.deviceId,
+                uris: new_queue,
+                position_ms: songState.position,
+            })
+            .then(() => {
+                dispatchSongState({
+                    type: 'SET_PLAYING_STATE',
+                    payLoad: {
+                        isPlaying: true,
+                        context_artist: [],
+                    },
+                });
+            });
+    };
+
+    const handlePause = () => {
+        spotifyApi.pause().then(() => {
+            dispatchSongState({
+                type: 'SET_PLAYING_STATE',
+                payLoad: {
+                    isPlaying: false,
+                    context_artist: [],
+                },
+            });
+        });
+    };
 
     useEffect(() => {
         const getArtist = async () => {
@@ -27,18 +61,17 @@ const Artist = () => {
             setMainColor(color.DarkVibrant.getHex());
             setArtist(artist.body);
             const isFolllow = await spotifyApi.isFollowingArtists([id]);
-            setIsFollow(isFolllow);
+            setIsFollow(isFolllow.body[0]);
         };
 
         const getTopTracks = async () => {
             const topTracks = await spotifyApi.getArtistTopTracks(id, 'VN');
             setTopTracks(topTracks.body.tracks);
         };
-        if (spotifyApi.getAccessToken()) {
+        if (!spotifyApi.error) {
             getArtist();
             getTopTracks();
         }
-
     }, [spotifyApi, id]);
 
     return (
@@ -94,8 +127,32 @@ const Artist = () => {
                 }}
             >
                 <div className="h-auto p-[18px] flex items-center relative">
-                    <button className="w-[56px] h-[56px] bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition mr-8">
-                        <PlayIcon />
+                    <button
+                        className="w-[56px] h-[56px] bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition mr-8"
+                        onClick={() => {
+                            if (songState.isPlaying) {
+                                handlePause();
+                            } else {
+                                handlePlayAndResume();
+                            }
+                        }}
+                    >
+                        <div
+                            style={{
+                                display:
+                                    songState?.artistIds?.includes(id) &&
+                                    songState?.isPlaying == true &&
+                                    'none',
+                            }}
+                        >
+                            <PlayIcon />
+                        </div>
+                        {songState?.artistIds?.includes(id) &&
+                            songState?.isPlaying == true && (
+                                <div>
+                                    <PauseIcon />
+                                </div>
+                            )}
                     </button>
                     <button
                         className="w-fit ring-1 hover:ring-2 hover:scale-105 ring-white transition rounded-full  py-[3px] px-[15px] cursor-pointer text-sm"

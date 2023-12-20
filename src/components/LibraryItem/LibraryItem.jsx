@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { MusicIcon } from '../Icons';
+import { MusicIcon, VolumnIcon } from '../Icons';
 
-const LibraryItem = ({ data, isPlay }) => {
+const LibraryItem = ({ data, isActive, isPlaying }) => {
     return (
         <Link
             className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between"
@@ -32,15 +32,20 @@ const LibraryItem = ({ data, isPlay }) => {
                 <h4
                     className="text-climp-1 text-[#f5f5f5] font-normal"
                     style={{
-                        color: isPlay && '#1db954',
+                        color: isActive && '#1db954',
                     }}
                 >
                     {data?.name}
                 </h4>
-                <span className="text-climp-1 text-[#8c8c8c] text-sm capitalize">
+                <span className="text-climp-1 text-[#8c8c8c] text-sm capitalize font-normal">
                     {data?.type}
                 </span>
             </div>
+            {isPlaying && (
+                <div>
+                    <VolumnIcon level="high" className="text-[#1db954]" />
+                </div>
+            )}
         </Link>
     );
 };

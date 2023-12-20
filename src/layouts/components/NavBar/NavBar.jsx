@@ -4,28 +4,83 @@ import {
     BellIcon,
     ChevronLeft,
     ChevronRight,
+    PauseIcon,
     PlayIcon,
 } from '~/components/Icons';
 import { Link, useLocation } from 'react-router-dom';
 import SearchInput from '~/components/SearchInput';
 import { AUTH_URL } from '~/config/spotify';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
+import useSongReducer from '~/hooks/useSongReducer';
 
 // eslint-disable-next-line react-refresh/only-export-components
-const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
+const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     const location = useLocation();
     const [user, setUser] = useState({});
+    const [topTracks, setTopTracks] = useState([]);
+    const [typeIds, setTypeIds] = useState([]);
+    const { songState, dispatchSongState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
     console.log('Navbar render');
+    const context = topTracks.map((track) => {
+        return track?.uri;
+    });
+
+    const handlePlayAndResume = async () => {
+        const idx = context.indexOf(songState.uri);
+        const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
+
+        spotifyApi
+            .play({
+                device_id: songState.deviceId,
+                uris: new_queue,
+                position_ms: songState.position,
+            })
+            .then(() => {
+                dispatchSongState({
+                    type: 'SET_PLAYING_STATE',
+                    payLoad: {
+                        isPlaying: true,
+                        context_artist: [],
+                    },
+                });
+            });
+    };
+
+    const handlePause = () => {
+        spotifyApi.pause().then(() => {
+            dispatchSongState({
+                type: 'SET_PLAYING_STATE',
+                payLoad: {
+                    isPlaying: false,
+                    context_artist: [],
+                },
+            });
+        });
+    };
 
     useEffect(() => {
         console.log('navbar useEffect');
-        if (!spotifyApi.error) {
-            spotifyApi.getMe().then((data) => {
-                setUser(data.body);
-            });
+        const loadData = async () => {
+            const user = await spotifyApi.getMe();
+            setUser(user.body);
+            const toptracks = await spotifyApi.getArtistTopTracks(
+                currentContent.id,
+                'VN',
+            );
+            setTopTracks(toptracks.body.tracks);
+        };
+
+        if (!spotifyApi.error && currentContent.id) {
+            loadData();
         }
-    }, [spotifyApi]);
+    }, [spotifyApi, currentContent.id]);
+
+    useEffect(() => {
+        if (currentContent.type == 'artist') {
+            setTypeIds(songState.artistIds);
+        }
+    }, [location.pathname, songState.artistIds.length]);
 
     return (
         <nav
@@ -50,10 +105,33 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                         pointerEvents: isHide == true ? 'none' : 'all',
                     }}
                 >
-                    <button className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition">
-                        <PlayIcon />
+                    <button
+                        className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition"
+                        onClick={() => {
+                            if (songState.isPlaying) handlePause();
+                            else handlePlayAndResume();
+                        }}
+                    >
+                        <div
+                            style={{
+                                display:
+                                    typeIds?.includes(currentContent?.id) &&
+                                    songState.isPlaying == true &&
+                                    'none',
+                            }}
+                        >
+                            <PlayIcon />
+                        </div>
+                        {typeIds?.includes(currentContent?.id) &&
+                            songState.isPlaying == true && (
+                                <div>
+                                    <PauseIcon />
+                                </div>
+                            )}
                     </button>
-                    <span className="text-climp-1 text-2xl font-bold">{currentContent}</span>
+                    <span className="text-climp-1 text-2xl font-bold">
+                        {currentContent?.name}
+                    </span>
                 </div>
             )}
             {location.pathname.includes('/search') && <SearchInput />}
@@ -91,8 +169,8 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                             href={AUTH_URL}
                             className="flex items-center justify-center cursor-pointer font-bold text-[#848484] p-2 hover:scale-105 hover:text-white bg-transparent transition"
                             onClick={() => {
-                                localStorage.removeItem('access_token')
-                                localStorage.removeItem('refresh_token')
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
                             }}
                         >
                             Sign up
@@ -101,8 +179,8 @@ const NavBar = ({ isHide = true, currentContent = '' }, ref) => {
                             href={AUTH_URL}
                             className="flex items-center justify-center cursor-pointer py-2 px-8 h-12 rounded-full bg-white text-black font-bold hover:scale-105 transition"
                             onClick={() => {
-                                localStorage.removeItem('access_token')
-                                localStorage.removeItem('refresh_token')
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
                             }}
                         >
                             Log in

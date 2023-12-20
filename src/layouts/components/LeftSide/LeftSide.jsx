@@ -1,16 +1,16 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { PlaybackContext } from '~/Provider/PlaybackProvider';
+import { useEffect, useRef, useState } from 'react';
 import { LanguageIcon, LibraryIcon, PlusIcon } from '~/components/Icons';
 import LibraryItem from '~/components/LibraryItem';
 import Menu from '~/components/Menu';
 import { LEFTSIDE_FOOTER_ITEMS } from '~/const.data';
+import useSongReducer from '~/hooks/useSongReducer';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const LeftSide = () => {
     const shadow = useRef();
     const [user, setUser] = useState({});
     const [library, setLibrary] = useState({});
-    const { songState } = useContext(PlaybackContext)
+    const { songState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
 
     const handleScroll = (e) => {
@@ -44,7 +44,6 @@ const LeftSide = () => {
             loadLibrary();
         }
     }, [spotifyApi]);
-
 
     return (
         <>
@@ -126,7 +125,15 @@ const LeftSide = () => {
                                                                         ? item.album
                                                                         : item
                                                                 }
-                                                                isPlay={songState.artistIds.includes(item.id)}
+                                                                isActive={songState?.artistIds?.includes(
+                                                                    item?.id,
+                                                                )}
+                                                                isPlaying={
+                                                                    songState?.artistIds?.includes(
+                                                                        item?.id,
+                                                                    ) &&
+                                                                    songState.isPlaying
+                                                                }
                                                             />
                                                         </div>
                                                     );

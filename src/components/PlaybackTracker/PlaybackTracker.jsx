@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import useSongReducer from '~/hooks/useSongReducer';
 import { durationConvert } from '~/utils/durationConvert';
 
-const PlaybackTracker = ({ player, state }) => {
+const PlaybackTracker = ({ player }) => {
+    const { songState, dispatchSongState } = useSongReducer();
     const tracker = useRef();
-    const max = Math.floor(state.duration / 1000);
-    const [position, setPosition] = useState(Math.floor(state.position / 1000));
+    const max = Math.floor(songState.duration / 1000);
+    const [position, setPosition] = useState(
+        Math.floor(songState.position / 1000),
+    );
     const [isSeeking, setIsSeeking] = useState(false);
-    const [currentSongID, setCurrentSongID] = useState(state?.track_window?.current_track?.id);
+    const [currentSongID, setCurrentSongID] = useState(songState.songId);
 
     console.log('Playback Tracker re-render');
 
@@ -16,12 +20,12 @@ const PlaybackTracker = ({ player, state }) => {
     }, [position]);
 
     useEffect(() => {
-        if (currentSongID != state.track_window.current_track.id) {
+        if (currentSongID != songState?.songId) {
             setPosition(0);
-            setCurrentSongID(state.track_window.current_track.id);
+            setCurrentSongID(songState?.songId);
         }
         var timer;
-        if (!state.paused) {
+        if (songState.isPlaying) {
             timer = setInterval(() => {
                 setPosition((prev) => {
                     if (prev >= tracker.current.max) {
@@ -32,7 +36,7 @@ const PlaybackTracker = ({ player, state }) => {
             }, 1000);
         }
         return () => clearInterval(timer);
-    }, [isSeeking, state.paused, state.playback_id]);
+    }, [isSeeking, songState.isPlaying, songState.songId]);
 
     return (
         <div className="w-full flex items-center justify-between gap-2">
@@ -45,12 +49,10 @@ const PlaybackTracker = ({ player, state }) => {
                 ref={tracker}
                 onInput={(e) => {
                     setIsSeeking(true);
-                    console.log(Number(e.target.value));
                     setPosition(Number(e.target.value));
                 }}
                 onMouseUp={() => {
                     setIsSeeking(false);
-                    console.log(position);
                     player.seek(position * 1000).then(() => {
                         console.log('Changed position!');
                     });
@@ -60,7 +62,7 @@ const PlaybackTracker = ({ player, state }) => {
                 value={position}
             />
             <span className="w-6 flex-shrink-0 text-[11px] text-[#a7a7a7]">
-                {durationConvert(state.duration)}
+                {durationConvert(songState.duration)}
             </span>
         </div>
     );

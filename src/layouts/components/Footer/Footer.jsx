@@ -13,9 +13,8 @@ const track = {
 };
 
 const Footer = () => {
-    const [user, setUser] = useState({});
     const spotifyApi = useSpotifyApi();
-    const { dispatchSongState } = useSongReducer();
+    const { songState, dispatchSongState } = useSongReducer();
 
     const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
@@ -62,6 +61,7 @@ const Footer = () => {
                     if (!state) {
                         return;
                     }
+
                     dispatchSongState({
                         type: 'UPDATE_SONG_STATE',
                         payLoad: {
@@ -84,6 +84,13 @@ const Footer = () => {
                     setTrack(state.track_window.current_track);
                     setPaused(state.paused);
 
+                    if (is_paused) {
+                        document.title =
+                            'Spotify - Web player: Music for everyone';
+                    } else
+                        document.title =
+                            state?.track_window?.current_track?.name;
+
                     player.getCurrentState().then((state) => {
                         !state ? setActive(false) : setActive(true);
                     });
@@ -94,17 +101,9 @@ const Footer = () => {
         }
     }, [spotifyApi]);
 
-    useEffect(() => {
-        if (!spotifyApi.error) {
-            spotifyApi.getMe().then((data) => {
-                setUser(data.body);
-            });
-        }
-    }, [spotifyApi]);
-
     return (
         <>
-            {Object.keys(user).length > 0 ? (
+            {Object.keys(songState.user).length > 0 ? (
                 <Player
                     data={{
                         is_active,

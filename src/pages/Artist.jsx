@@ -19,15 +19,20 @@ const Artist = () => {
         return track?.uri;
     });
 
-    const handlePlayAndResume = async () => {
+    const handlePlayAndResume = async (e) => {
+        const artistId = e.currentTarget.parentElement.dataset.id;
         const idx = context.indexOf(songState.uri);
         const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
 
         spotifyApi
             .play({
                 device_id: songState.deviceId,
-                uris: new_queue,
-                position_ms: songState.position,
+                uris: songState.artistIds.includes(artistId)
+                    ? new_queue
+                    : context,
+                position_ms: songState.artistIds.includes(artistId)
+                    ? songState.position
+                    : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -77,12 +82,12 @@ const Artist = () => {
     return (
         <div className="h-auto w-full -mt-nav">
             <div
-                className="h-[40vh] max-h-[400px] px-6 pb-8 min-h-[340px] w-full flex items-end"
+                className="px-6 pb-8 min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] w-full flex items-end"
                 style={{
                     backgroundColor: mainColor,
                 }}
             >
-                <div className=" flex-shrink-0 w-[232px] h-[232px] mr-8 rounded-full shadow-blur-xl overflow-hidden">
+                <div className="flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-full shadow-blur-xl overflow-hidden">
                     <img
                         src={
                             artist?.images?.length > 0
@@ -102,14 +107,14 @@ const Artist = () => {
                                 height={24}
                             />
                         </div>
-                        <span className="text-sm relative top-[2px]">
+                        <span className="text-sm relative top-[2px] font-light">
                             Verified Artist
                         </span>
                     </div>
-                    <div className="mt-1 mb-3 text-[96px] capitalize font-extrabold">
+                    <div className="mt-1 mb-3 text-[32px] md:text-[60px] xl:text-[96px] capitalize font-extrabold">
                         <h1 className="">{artist?.name}</h1>
                     </div>
-                    <div className="text-white mt-1 font-normal">
+                    <div className="text-white mt-1 font-normal text-sm md:text-base">
                         <span>
                             {String(artist?.followers?.total).replace(
                                 /\B(?=(\d{3})+(?!\d))/g,
@@ -128,28 +133,25 @@ const Artist = () => {
             >
                 <div className="h-auto p-[18px] flex items-center relative">
                     <button
-                        className="w-[56px] h-[56px] bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition mr-8"
-                        onClick={() => {
-                            if (songState.isPlaying) {
-                                handlePause();
-                            } else {
-                                handlePlayAndResume();
-                            }
-                        }}
+                        className="flex-shrink-0 flex items-center justify-center w-[56px] h-[56px] bg-[#1db954] text-black rounded-full hover:scale-105 transition mr-8 overflow-hidden"
+                        data-id={id}
                     >
                         <div
+                            className="p-[100%]"
                             style={{
                                 display:
                                     songState?.artistIds?.includes(id) &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
+                            onClick={handlePlayAndResume}
                         >
                             <PlayIcon />
                         </div>
                         {songState?.artistIds?.includes(id) &&
                             songState?.isPlaying == true && (
-                                <div>
+                                <div className='p-[100%]' 
+                                onClick={handlePause}>
                                     <PauseIcon />
                                 </div>
                             )}

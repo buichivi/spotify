@@ -28,7 +28,10 @@ export const initLibraryState = {
 export const libraryReducer = (state, action) => {
     switch (action.type) {
         case '':
-            return {};
+            return {
+                ...state,
+                
+            };
         default:
             return state;
     }

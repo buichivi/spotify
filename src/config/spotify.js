@@ -30,6 +30,4 @@ const spotifyApi = new SpotifyWebApi({
 	redirectUri: window.location.origin
 })
 
-console.log(import.meta.env.VITE_SPOTIFY_CLIENT_ID);
-
 export { spotifyApi, scopes, AUTH_ENDPOINT, AUTH_URL }

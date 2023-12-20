@@ -10,6 +10,8 @@ export default {
                 'category-gap': '24px',
                 'category-item': 'calc((100% - (24px * 4)) / 5)',
                 genre: 'calc((100% - 12px * 4) / 5)',
+                contentImgWidth: 'clamp(128px,128px + (100vw - 280px - 600px)/424*104,232px)',
+                contentImgHeight: 'clamp(128px,128px + (100vw - 280px - 600px)/424*104,232px)'
             },
             boxShadow: {
                 blur: '0 9px 6px 5px rgba(0, 0, 0, 0.5)',

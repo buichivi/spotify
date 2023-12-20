@@ -1,4 +1,8 @@
 export const initSongState = {
+    user: {
+        name: '',
+        imageUrl: '',
+    },
     songId: '',
     albumId: '',
     artistIds: [],
@@ -28,7 +32,6 @@ export const songReducer = (state, action) => {
                 ...action.payLoad,
             };
         case 'SET_PLAYING_STATE':
-            console.log(action.payLoad);
             return {
                 ...state,
                 isPlaying: action.payLoad.isPlaying,
@@ -41,6 +44,11 @@ export const songReducer = (state, action) => {
                     ],
                 },
             };
+        case 'SET_USER': 
+            return {
+                ...state,
+                user: { ...action.payLoad }
+            }
         default:
             return state;
     }

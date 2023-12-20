@@ -8,7 +8,6 @@ import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const LeftSide = () => {
     const shadow = useRef();
-    const [user, setUser] = useState({});
     const [library, setLibrary] = useState({});
     const { songState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
@@ -20,8 +19,6 @@ const LeftSide = () => {
 
     useEffect(() => {
         const loadLibrary = async () => {
-            const user = await spotifyApi.getMe();
-            setUser(user.body);
             const playlists = await spotifyApi.getUserPlaylists();
             setLibrary((prev) => ({
                 ...prev,
@@ -72,7 +69,7 @@ const LeftSide = () => {
                         onScroll={handleScroll}
                     >
                         <div className="w-full h-full flex flex-col justify-between">
-                            {!Object.keys(user).length > 0 ? (
+                            {!Object.keys(songState.user).length > 0 ? (
                                 <>
                                     <div className="w-full h-[134px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
                                         <div className="w-full h-[50px] flex flex-col justify-between">
@@ -146,7 +143,7 @@ const LeftSide = () => {
                         </div>
                     </div>
                 </div>
-                {!Object.keys(user).length > 0 && (
+                {!Object.keys(songState.user).length > 0 && (
                     <div>
                         <ul className="px-6 my-8 flex flex-wrap">
                             {LEFTSIDE_FOOTER_ITEMS.map((item, index) => {

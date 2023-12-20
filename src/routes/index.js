@@ -1,4 +1,5 @@
 import { Home, Search, Artist, Collection, Playlist } from '~/pages'
+import Album from '~/pages/Album'
 
 const publicRoutes = [
     {
@@ -20,6 +21,10 @@ const publicRoutes = [
     {
         path: '/playlist',
         element: Playlist
+    },
+    {
+        path: '/album/:id',
+        element: Album
     },
 ]
 

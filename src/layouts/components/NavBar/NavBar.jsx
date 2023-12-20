@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, memo, useEffect, useState } from 'react';
 import {
     ArrowDownIcon,
     BellIcon,
@@ -16,7 +16,6 @@ import useSongReducer from '~/hooks/useSongReducer';
 // eslint-disable-next-line react-refresh/only-export-components
 const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     const location = useLocation();
-    const [user, setUser] = useState({});
     const [topTracks, setTopTracks] = useState([]);
     const [typeIds, setTypeIds] = useState([]);
     const { songState, dispatchSongState } = useSongReducer();
@@ -26,15 +25,20 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
         return track?.uri;
     });
 
-    const handlePlayAndResume = async () => {
+    const handlePlayAndResume = async (e) => {
+        const artistId = e.currentTarget.parentElement.dataset.id;
         const idx = context.indexOf(songState.uri);
         const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
 
         spotifyApi
             .play({
                 device_id: songState.deviceId,
-                uris: new_queue,
-                position_ms: songState.position,
+                uris: songState.artistIds.includes(artistId)
+                    ? new_queue
+                    : context,
+                position_ms: songState.artistIds.includes(artistId)
+                    ? songState.position
+                    : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -59,20 +63,20 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
         });
     };
 
+
+
     useEffect(() => {
-        console.log('navbar useEffect');
-        const loadData = async () => {
-            const user = await spotifyApi.getMe();
-            setUser(user.body);
+        const loadArtistTopTracks = async () => {
             const toptracks = await spotifyApi.getArtistTopTracks(
                 currentContent.id,
                 'VN',
             );
             setTopTracks(toptracks.body.tracks);
         };
-
         if (!spotifyApi.error && currentContent.id) {
-            loadData();
+            if (currentContent.type == 'artist') {
+                loadArtistTopTracks();
+            }
         }
     }, [spotifyApi, currentContent.id]);
 
@@ -80,7 +84,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
         if (currentContent.type == 'artist') {
             setTypeIds(songState.artistIds);
         }
-    }, [location.pathname, songState.artistIds.length]);
+    }, [location.pathname, songState.artistIds]);
 
     return (
         <nav
@@ -106,25 +110,24 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                     }}
                 >
                     <button
-                        className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition"
-                        onClick={() => {
-                            if (songState.isPlaying) handlePause();
-                            else handlePlayAndResume();
-                        }}
+                        className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition overflow-hidden"
+                        data-id={currentContent?.id}
                     >
                         <div
+                            className="p-[100%]"
                             style={{
                                 display:
                                     typeIds?.includes(currentContent?.id) &&
                                     songState.isPlaying == true &&
                                     'none',
                             }}
+                            onClick={handlePlayAndResume}
                         >
                             <PlayIcon />
                         </div>
                         {typeIds?.includes(currentContent?.id) &&
                             songState.isPlaying == true && (
-                                <div>
+                                <div className="p-[100%]" onClick={handlePause}>
                                     <PauseIcon />
                                 </div>
                             )}
@@ -135,7 +138,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                 </div>
             )}
             {location.pathname.includes('/search') && <SearchInput />}
-            {Object.keys(user).length === 0 ? (
+            {Object.keys(songState.user).length === 0 ? (
                 <div className="flex items-center justify-between gap-[25px]">
                     <ul className="flex items-center px-2 py-2 gap-2">
                         <li>
@@ -215,19 +218,18 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                         className="flex items-center gap-2 justify-center cursor-pointer py-1 px-3 h-9 rounded-full transition"
                     >
                         <img
-                            src={user.images && user.images[0].url}
+                            src={songState.user.imageUrl}
                             width={28}
                             height={28}
-                            alt={user.display_name}
+                            alt={songState.user.name}
                             className="rounded-full"
                         />
-                        <span>{user.display_name}</span>
+                        <span>{songState.user.name}</span>
                     </button>
                 </div>
             )}
         </nav>
     );
 };
-
 // eslint-disable-next-line react-refresh/only-export-components
-export default forwardRef(NavBar);
+export default memo(forwardRef(NavBar));

@@ -37,6 +37,12 @@ const RightSide = ({ children }) => {
                 setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/album')) {
                 contentID = location.pathname.split('/album/')[1];
+                const album = await spotifyApi.getAlbum(contentID);
+                setContent(album.body);
+                const color = await Vibrant.from(
+                    album.body.images[0].url,
+                ).getPalette();
+                setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/playlist')) {
                 contentID = location.pathname.split('/playlist/')[1];
             }

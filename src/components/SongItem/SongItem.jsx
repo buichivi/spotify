@@ -2,8 +2,9 @@ import { PauseIcon, PlayIcon } from '../Icons';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 import { durationConvert } from '~/utils/durationConvert';
 import useSongReducer from '~/hooks/useSongReducer';
+import { Link } from 'react-router-dom';
 
-const SongItem = ({ orderNum = 1, trackData = {}, context }) => {
+const SongItem = ({ orderNum = 1, trackData = {}, context, isHide = false }) => {
     const { songState, dispatchSongState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
 
@@ -45,7 +46,7 @@ const SongItem = ({ orderNum = 1, trackData = {}, context }) => {
 
     return (
         <div className="group px-4 h-[54px] flex items-center justify-between gap-4 rounded-md hover:bg-[#ffffff1a] transition">
-            <div className="w-4 flex items-center justify-center relative">
+            <div className="flex-shrink-0 w-4 flex items-center justify-center relative">
                 <span
                     className="group-hover:hidden block relative top-[2px] text-[#a7a7a7] font-light"
                     style={{
@@ -91,14 +92,16 @@ const SongItem = ({ orderNum = 1, trackData = {}, context }) => {
                     )}
                 </div>
             </div>
-            <div className="w-10 h-10 flex-shrink-0 rounded-md overflow-hidden">
-                <img
-                    className="w-full h-full object-cover"
-                    src={trackData?.album?.images[0].url}
-                    alt=""
-                />
-            </div>
-            <div className="flex-1 flex flex-col justify-start">
+            {!isHide && (
+                <div className="w-10 h-10 flex-shrink-0 rounded-md overflow-hidden">
+                    <img
+                        className="w-full h-full object-cover"
+                        src={trackData?.album?.images[0].url}
+                        alt=""
+                    />
+                </div>
+            )}
+            <div className="flex-1 flex flex-col justify-start flex-shrink-0">
                 <span
                     className="text-base text-white text-climp-1"
                     style={{
@@ -110,11 +113,32 @@ const SongItem = ({ orderNum = 1, trackData = {}, context }) => {
                 >
                     {trackData.name}
                 </span>
-                {trackData.explicit && (
-                    <div className="w-4 h-4 bg-[#ffffff99] text-[#121212] flex items-center justify-center rounded-sm">
-                        <span className="text-[8px] relative top-[1px]">E</span>
-                    </div>
-                )}
+                <div className="flex">
+                    {trackData.explicit && (
+                        <div className="w-4 h-4 mr-2 bg-[#ffffff99] text-[#121212] flex items-center justify-center rounded-sm">
+                            <span className="text-[8px] relative top-[1px]">
+                                E
+                            </span>
+                        </div>
+                    )}
+                    {isHide && <div className="relative -top-[2px]">
+                        {trackData?.artists.map((artist, index) => {
+                            return (
+                                <Link
+                                    key={index}
+                                    className="text-sm font-light text-[#a7a7a7]"
+                                    to={`/artist/${artist?.id}`}
+                                >
+                                    <span className="hover:underline">
+                                        {artist.name}
+                                    </span>
+                                    {index <= trackData?.artists.length - 2 &&
+                                        ', '}
+                                </Link>
+                            );
+                        })}
+                    </div>}
+                </div>
             </div>
             <div className="">
                 <span className="text-[#a7a7a7] text-sm font-light">

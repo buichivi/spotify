@@ -17,7 +17,7 @@ const Album = () => {
         return track?.uri;
     });
     const totalTime = album?.tracks?.items?.reduce((acc, item) => {
-        return acc + item?.duration_ms;
+        return acc + Number(item?.duration_ms);
     }, 0);
 
     const handlePlayAndResume = async () => {};
@@ -63,7 +63,7 @@ const Album = () => {
                     <div className="mt-1 mb-3 text-[18px] md:text-[34px] xl:text-[48px] capitalize font-extrabold">
                         <h1 className="">{album?.name}</h1>
                     </div>
-                    <div className="text-white mt-1 font-normal flex items-end min-w-[300px]">
+                    <div className="min-w-[470px] text-white mt-1 font-normal flex items-end">
                         {album?.artists?.map((artist, index) => {
                             return (
                                 <div key={index}>

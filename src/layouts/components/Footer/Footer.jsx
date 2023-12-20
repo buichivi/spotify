@@ -103,7 +103,7 @@ const Footer = () => {
 
     return (
         <>
-            {Object.keys(songState.user).length > 0 ? (
+            {songState.user.name !== '' ? (
                 <Player
                     data={{
                         is_active,

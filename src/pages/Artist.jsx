@@ -5,10 +5,12 @@ import Vibrant from 'node-vibrant';
 import { PauseIcon, PlayIcon, VerifyIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
 import useSongReducer from '~/hooks/useSongReducer';
+import useLibraryReducer from '~/hooks/useLibraryReducer';
 
 const Artist = () => {
     const { id } = useParams();
     const { songState, dispatchSongState } = useSongReducer();
+    const { dispatchLibraryState } = useLibraryReducer();
     const [artist, setArtist] = useState({});
     const [topTracks, setTopTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
@@ -150,8 +152,7 @@ const Artist = () => {
                         </div>
                         {songState?.artistIds?.includes(id) &&
                             songState?.isPlaying == true && (
-                                <div className='p-[100%]' 
-                                onClick={handlePause}>
+                                <div className="p-[100%]" onClick={handlePause}>
                                     <PauseIcon />
                                 </div>
                             )}
@@ -162,10 +163,23 @@ const Artist = () => {
                             if (isFollow) {
                                 spotifyApi.unfollowArtists([id]).then(() => {
                                     setIsFollow(false);
+                                    dispatchLibraryState({
+                                        type: 'UNFOLLOW_ARTIST',
+                                        payLoad: id,
+                                    });
                                 });
                             } else {
                                 spotifyApi.followArtists([id]).then(() => {
                                     setIsFollow(true);
+                                    dispatchLibraryState({
+                                        type: 'FOLLOW_ARTIST',
+                                        payLoad: {
+                                            id: id,
+                                            imageUrl: artist?.images[0]?.url,
+                                            name: artist?.name,
+                                            type: artist?.type,
+                                        },
+                                    });
                                 });
                             }
                         }}

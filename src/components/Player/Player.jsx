@@ -41,21 +41,20 @@ function Player({ data }) {
                             <div className="text-climp-2 flex whitespace-normal">
                                 {current_track?.artists.map((artist, index) => {
                                     return (
-                                        <>
-                                            <Link
-                                                key={index}
-                                                to={`/artist/${
-                                                    artist?.uri?.split(':')[2]
-                                                }`}
-                                                className="text-[11px] text-[#b3b3b3]"
-                                            >
-                                                <span className='hover:underline'>{artist?.name}</span>
-                                                {index <=
-                                                    current_track.artists
-                                                        .length -
-                                                        2 && <span>, </span>}
-                                            </Link>
-                                        </>
+                                        <Link
+                                            key={index}
+                                            to={`/artist/${
+                                                artist?.uri?.split(':')[2]
+                                            }`}
+                                            className="text-[11px] text-[#b3b3b3]"
+                                        >
+                                            <span className="hover:underline">
+                                                {artist?.name}
+                                            </span>
+                                            {index <=
+                                                current_track.artists.length -
+                                                    2 && <span>, </span>}
+                                        </Link>
                                     );
                                 })}
                             </div>

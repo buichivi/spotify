@@ -1,46 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { LanguageIcon, LibraryIcon, PlusIcon } from '~/components/Icons';
 import LibraryItem from '~/components/LibraryItem';
 import Menu from '~/components/Menu';
 import { LEFTSIDE_FOOTER_ITEMS } from '~/const.data';
+import useLibraryReducer from '~/hooks/useLibraryReducer';
 import useSongReducer from '~/hooks/useSongReducer';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const LeftSide = () => {
     const shadow = useRef();
-    const [library, setLibrary] = useState({});
     const { songState } = useSongReducer();
-    const spotifyApi = useSpotifyApi();
+    const { libraryState } = useLibraryReducer();
 
     const handleScroll = (e) => {
         if (e.target.scrollTop) shadow.current.style.display = 'block';
         else shadow.current.style.display = 'none';
     };
 
-    useEffect(() => {
-        const loadLibrary = async () => {
-            const playlists = await spotifyApi.getUserPlaylists();
-            setLibrary((prev) => ({
-                ...prev,
-                playlists: playlists.body.items,
-            }));
-            const artists = await spotifyApi.getFollowedArtists({
-                limit: 50,
-            });
-            setLibrary((prev) => ({
-                ...prev,
-                artists: artists.body.artists.items,
-            }));
-            const albums = await spotifyApi.getMySavedAlbums();
-            setLibrary((prev) => ({
-                ...prev,
-                albums: albums.body.items,
-            }));
-        };
-        if (!spotifyApi.error) {
-            loadLibrary();
-        }
-    }, [spotifyApi]);
 
     return (
         <>
@@ -69,7 +44,7 @@ const LeftSide = () => {
                         onScroll={handleScroll}
                     >
                         <div className="w-full h-full flex flex-col justify-between">
-                            {!Object.keys(songState.user).length > 0 ? (
+                            {songState.user.name == '' ? (
                                 <>
                                     <div className="w-full h-[134px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
                                         <div className="w-full h-[50px] flex flex-col justify-between">
@@ -106,7 +81,7 @@ const LeftSide = () => {
                                 </>
                             ) : (
                                 <div className="w-full h-full">
-                                    {Object.entries(library).map(
+                                    {libraryState.artists.length > 0 && Object.entries(libraryState).map(
                                         (libraryItem) => {
                                             return libraryItem[1]?.map(
                                                 (item, index) => {
@@ -116,12 +91,7 @@ const LeftSide = () => {
                                                             className="w-full h-auto"
                                                         >
                                                             <LibraryItem
-                                                                data={
-                                                                    libraryItem[0] ==
-                                                                    'albums'
-                                                                        ? item.album
-                                                                        : item
-                                                                }
+                                                                data={item}
                                                                 isActive={songState?.artistIds?.includes(
                                                                     item?.id,
                                                                 )}
@@ -143,7 +113,7 @@ const LeftSide = () => {
                         </div>
                     </div>
                 </div>
-                {!Object.keys(songState.user).length > 0 && (
+                {songState.user.name == '' && (
                     <div>
                         <ul className="px-6 my-8 flex flex-wrap">
                             {LEFTSIDE_FOOTER_ITEMS.map((item, index) => {

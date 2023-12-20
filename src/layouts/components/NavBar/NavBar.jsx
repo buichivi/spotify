@@ -138,7 +138,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                 </div>
             )}
             {location.pathname.includes('/search') && <SearchInput />}
-            {Object.keys(songState.user).length === 0 ? (
+            {songState.user.name === '' ? (
                 <div className="flex items-center justify-between gap-[25px]">
                     <ul className="flex items-center px-2 py-2 gap-2">
                         <li>

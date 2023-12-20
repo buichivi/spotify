@@ -5,12 +5,12 @@ const LibraryItem = ({ data, isActive, isPlaying }) => {
     return (
         <Link
             className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between"
-            to={`/${data?.type}/${data.id}`}
+            to={`/${data?.type}/${data?.id}`}
         >
-            <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
-                {data.images.length > 0 ? (
+            <div className="w-12 h-12 flex-shrink-0 rounded-md overflow-hidden">
+                {data?.imageUrl ? (
                     <img
-                        src={data?.images[0]?.url}
+                        src={data?.imageUrl}
                         alt=""
                         className={`w-full h-full object-cover ${
                             data?.type == 'artist'
@@ -37,7 +37,7 @@ const LibraryItem = ({ data, isActive, isPlaying }) => {
                 >
                     {data?.name}
                 </h4>
-                <span className="text-climp-1 text-[#8c8c8c] text-sm capitalize font-normal">
+                <span className="text-climp-1 text-[#8c8c8c] text-sm capitalize font-light">
                     {data?.type}
                 </span>
             </div>

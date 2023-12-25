@@ -5,6 +5,8 @@ export const initLibraryState = {
             id: '',
             name: '',
             type: '',
+            uri: '',
+            owner: '',
         },
     ],
     albums: [
@@ -13,6 +15,8 @@ export const initLibraryState = {
             id: '',
             name: '',
             type: '',
+            uri: '',
+            owner: '',
         },
     ],
     artists: [
@@ -21,8 +25,10 @@ export const initLibraryState = {
             id: '',
             name: '',
             type: '',
+            uri: '',
         },
     ],
+    savedTracks: 0,
 };
 
 export const libraryReducer = (state, action) => {
@@ -43,6 +49,28 @@ export const libraryReducer = (state, action) => {
                 artists: [...state.artists].filter(
                     (artist) => artist.id !== action.payLoad,
                 ),
+            };
+        case 'SAVE_ALBUM':
+            return {
+                ...state,
+                albums: [...state.albums, action.payLoad],
+            };
+        case 'REMOVE_ALBUM':
+            return {
+                ...state,
+                albums: [...state.albums].filter(
+                    (album) => album.id !== action.payLoad,
+                ),
+            };
+        case 'REMOVE_A_SAVED_TRACK':
+            return {
+                ...state,
+                savedTracks: state.savedTracks - action.payLoad,
+            };
+        case 'ADD_A_SAVE_TRACK':
+            return {
+                ...state,
+                savedTracks: state.savedTracks + action.payLoad,
             };
         default:
             return state;

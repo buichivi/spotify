@@ -61,7 +61,6 @@ const Footer = () => {
                     if (!state) {
                         return;
                     }
-
                     dispatchSongState({
                         type: 'UPDATE_SONG_STATE',
                         payLoad: {
@@ -84,12 +83,18 @@ const Footer = () => {
                     setTrack(state.track_window.current_track);
                     setPaused(state.paused);
 
-                    if (is_paused) {
+                    if (state?.paused) {
                         document.title =
                             'Spotify - Web player: Music for everyone';
                     } else
                         document.title =
-                            state?.track_window?.current_track?.name;
+                            state?.track_window?.current_track?.name +
+                            ' - ' +
+                            state?.track_window?.current_track?.artists
+                                ?.map((artist) => {
+                                    return artist?.name;
+                                })
+                                .join(', ');
 
                     player.getCurrentState().then((state) => {
                         !state ? setActive(false) : setActive(true);

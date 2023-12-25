@@ -1,31 +1,69 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 import Vibrant from 'node-vibrant';
-import { ClockIcon, PauseIcon, PlayIcon, VerifyIcon } from '~/components/Icons';
+import { ClockIcon, HeartIcon, PauseIcon, PlayIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
 import useSongReducer from '~/hooks/useSongReducer';
-import { convertDurationToText } from '~/utils/convertDurationToText';
+import { convertDurationToText, convertDateString } from '~/utils';
+import useLibraryReducer from '~/hooks/useLibraryReducer';
 
 const Album = () => {
     const { id } = useParams();
     const { songState, dispatchSongState } = useSongReducer();
+    const { dispatchLibraryState } = useLibraryReducer();
     const [album, setAlbum] = useState({});
+    const [isSaved, setIsSaved] = useState(false);
     const [mainColor, setMainColor] = useState('');
     const spotifyApi = useSpotifyApi();
-    const context = album?.tracks?.items?.map((track) => {
-        return track?.uri;
-    });
     const totalTime = album?.tracks?.items?.reduce((acc, item) => {
         return acc + Number(item?.duration_ms);
     }, 0);
 
-    const handlePlayAndResume = async () => {};
+    // ! Lỗi khi mới tải trang và context_uri = '' và ấn nút play trên trang album
+    // ! thì bị lỗi thời gian không reset về 0
 
-    const handlePause = () => {};
+    const handlePlayAndResume = async () => {
+        const optionPlay =
+            album.uri == songState?.context?.context_uri
+                ? {
+                      context_uri: songState?.context?.context_uri,
+                      offset: songState?.context?.option?.offset,
+                  }
+                : {
+                      context_uri: album?.uri,
+                      offset: { uri: album?.tracks?.items[0]?.uri },
+                  };
+        spotifyApi
+            .play({
+                device_id: songState.deviceId,
+                ...optionPlay,
+                position_ms:
+                    songState?.context?.context_uri == album?.uri
+                        ? songState.position
+                        : 0,
+            })
+            .then(() => {
+                dispatchSongState({
+                    type: 'SET_CONTEXT',
+                    payLoad: {
+                        context: {
+                            context_uri: optionPlay?.context_uri,
+                            option: {
+                                offset: optionPlay?.offset,
+                            },
+                        },
+                    },
+                });
+            });
+    };
+
+    const handlePause = () => {
+        spotifyApi.pause();
+    };
 
     useEffect(() => {
-        const getArtist = async () => {
+        const getAlbum = async () => {
             const album = await spotifyApi.getAlbum(id);
             const color = await Vibrant.from(
                 album.body.images[0].url,
@@ -34,17 +72,50 @@ const Album = () => {
             setAlbum(album.body);
         };
 
+        const isLikeAlbum = async () => {
+            const isSaved = await spotifyApi.containsMySavedAlbums([id]);
+            setIsSaved(isSaved?.body[0]);
+        };
+
         if (!spotifyApi.error) {
-            getArtist();
+            getAlbum();
+            isLikeAlbum();
         }
     }, [spotifyApi, id]);
+
+    useEffect(() => {
+        if (
+            id === songState.albumId &&
+            album.uri &&
+            songState?.context?.context_uri == album.uri
+        ) {
+            dispatchSongState({
+                type: 'SET_CONTEXT',
+                payLoad: {
+                    context: {
+                        context_uri: album?.uri,
+                        option: {
+                            offset: {
+                                uri: songState?.uri,
+                            },
+                        },
+                    },
+                },
+            });
+        }
+    }, [songState.songId, album.uri]);
+
+    console.log(album);
 
     return (
         <div className="h-auto w-full -mt-nav">
             <div
-                className="min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] px-6 pb-8 w-full flex items-end"
+                className="min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] px-6 pb-8 w-full flex items-end
+                bg-gradient-to-b from-[#121212] from-[99%] to-[#121212] to-[99%]
+                "
                 style={{
-                    backgroundColor: mainColor,
+                    '--tw-gradient-from': mainColor,
+                    '--tw-gradient-to': mainColor + 'B3',
                 }}
             >
                 <div className=" flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-md shadow-blur-xl overflow-hidden">
@@ -98,39 +169,71 @@ const Album = () => {
                 </div>
             </div>
             <div
-                className="h-auto bg-gradient-to-b from-[#121212] from-[200px] to-[#121212 to-[200px] opacity-90 sticky top-0"
+                className="h-auto bg-gradient-to-b from-[#121212] from-[250px] to-[#121212 to-[250px] opacity-90 sticky top-0"
                 style={{
-                    '--tw-gradient-from': mainColor,
+                    '--tw-gradient-from': mainColor + '99',
                 }}
             >
                 <div className="h-auto p-[24px] flex items-center relative">
-                    <button
-                        className="w-[56px] h-[56px] bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition mr-8"
-                        onClick={() => {
-                            if (songState.isPlaying) {
-                                handlePause();
-                            } else {
-                                handlePlayAndResume();
-                            }
-                        }}
-                    >
+                    <button className="w-[56px] h-[56px] bg-[#1db954] text-black overflow-hidden rounded-full flex items-center justify-center hover:scale-105 transition mr-8">
                         <div
+                            className="p-[100%]"
+                            onClick={handlePlayAndResume}
                             style={{
                                 display:
-                                    songState?.artistIds?.includes(id) &&
+                                    songState?.context?.context_uri ==
+                                        album?.uri &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.artistIds?.includes(id) &&
+                        {songState?.context?.context_uri == album?.uri &&
                             songState?.isPlaying == true && (
-                                <div>
+                                <div className="p-[100%]" onClick={handlePause}>
                                     <PauseIcon />
                                 </div>
                             )}
                     </button>
+                    <div
+                        className="text-[#a7a7a7] hover:text-white cursor-pointer"
+                        onClick={() => {
+                            if (!isSaved) {
+                                spotifyApi.addToMySavedAlbums([id]).then(() => {
+                                    setIsSaved(true);
+                                    dispatchLibraryState({
+                                        type: 'SAVE_ALBUM',
+                                        payLoad: {
+                                            imageUrl: album?.images[0]?.url,
+                                            id: album?.id,
+                                            name: album?.name,
+                                            type: album?.type,
+                                            uri: album?.uri,
+                                            owner: album?.artists[0].name
+                                        },
+                                    });
+                                });
+                            } else {
+                                spotifyApi
+                                    .removeFromMySavedAlbums([id])
+                                    .then(() => {
+                                        setIsSaved(false);
+                                        dispatchLibraryState({
+                                            type: 'REMOVE_ALBUM',
+                                            payLoad: id,
+                                        });
+                                    });
+                            }
+                        }}
+                    >
+                        <HeartIcon
+                            className={`w-6 h-6 md:w-8 md:h-8 ${
+                                isSaved && 'text-[#1db954]'
+                            }`}
+                            isLiked={isSaved}
+                        />
+                    </div>
                 </div>
                 <div className="px-6">
                     <div className="h-[36px] flex items-center justify-between gap-4 px-4 mb-6 border-b-[1px] border-[#ffffff1a] text-[#a7a7a7]">
@@ -147,26 +250,23 @@ const Album = () => {
                                     <SongItem
                                         orderNum={index + 1}
                                         trackData={track}
-                                        context={context}
-                                        isHide
+                                        context={album?.uri}
+                                        isHideImg
+                                        isAlbum
+                                        albumUri={album?.uri}
                                     />
                                 </div>
                             );
                         })}
                     </div>
                     <div className="mt-8 text-sm text-[#b3b3b3] font-light">
-                        <span>
-                            {new Date(album?.release_date).toLocaleDateString(
-                                'en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                },
-                            )}
-                        </span>
+                        <span>{convertDateString(album?.release_date)}</span>
                         {album?.copyrights?.map((copyright, index) => {
-                            return <p key={index} className='text-xs'>{copyright.text}</p>;
+                            return (
+                                <p key={index} className="text-xs">
+                                    {copyright.text}
+                                </p>
+                            );
                         })}
                     </div>
                 </div>

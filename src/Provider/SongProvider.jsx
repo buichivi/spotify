@@ -11,6 +11,8 @@ const SongProvider = ({ children }) => {
 
     const spotifyApi = useSpotifyApi();
 
+    console.log(songState);
+
     useEffect(() => {
         const loadUser = async () => {
             const user = await spotifyApi.getMe();

@@ -10,12 +10,12 @@ const LeftSide = () => {
     const shadow = useRef();
     const { songState } = useSongReducer();
     const { libraryState } = useLibraryReducer();
+    const { albums, artists, playlists, savedTracks } = libraryState;
 
     const handleScroll = (e) => {
         if (e.target.scrollTop) shadow.current.style.display = 'block';
         else shadow.current.style.display = 'none';
     };
-
 
     return (
         <>
@@ -81,33 +81,44 @@ const LeftSide = () => {
                                 </>
                             ) : (
                                 <div className="w-full h-full">
-                                    {libraryState.artists.length > 0 && Object.entries(libraryState).map(
-                                        (libraryItem) => {
-                                            return libraryItem[1]?.map(
-                                                (item, index) => {
-                                                    return (
-                                                        <div
-                                                            key={index}
-                                                            className="w-full h-auto"
-                                                        >
-                                                            <LibraryItem
-                                                                data={item}
-                                                                isActive={songState?.artistIds?.includes(
-                                                                    item?.id,
-                                                                )}
-                                                                isPlaying={
-                                                                    songState?.artistIds?.includes(
-                                                                        item?.id,
-                                                                    ) &&
-                                                                    songState.isPlaying
-                                                                }
-                                                            />
-                                                        </div>
-                                                    );
-                                                },
-                                            );
-                                        },
-                                    )}
+                                    <LibraryItem
+                                        data={{
+                                            type: 'collection',
+                                            id: 'tracks',
+                                            imageUrl: 'https://t.ly/1m3eT',
+                                            name: 'Liked songs'
+                                        }}
+                                        owner={savedTracks + ' song' + (savedTracks > 2 ? 's' : '')}
+                                    />
+                                    {artists.length > 0 &&
+                                        playlists
+                                            .concat(albums, artists)
+                                            .map((item, index) => {
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="w-full h-auto"
+                                                    >
+                                                        <LibraryItem
+                                                            data={item}
+                                                            isActive={
+                                                                songState
+                                                                    ?.context
+                                                                    ?.context_uri ==
+                                                                item?.uri
+                                                            }
+                                                            isPlaying={
+                                                                songState
+                                                                    ?.context
+                                                                    ?.context_uri ==
+                                                                    item?.uri &&
+                                                                songState.isPlaying
+                                                            }
+                                                            owner={item?.owner}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
                                 </div>
                             )}
                         </div>

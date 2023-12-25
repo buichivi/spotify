@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import useSongReducer from '~/hooks/useSongReducer';
-import { durationConvert } from '~/utils/durationConvert';
+import { durationConvert } from '~/utils';
 
 const PlaybackTracker = ({ player }) => {
-    const { songState, dispatchSongState } = useSongReducer();
+    const { songState } = useSongReducer();
     const tracker = useRef();
     const max = Math.floor(songState.duration / 1000);
     const [position, setPosition] = useState(
@@ -37,6 +37,10 @@ const PlaybackTracker = ({ player }) => {
         }
         return () => clearInterval(timer);
     }, [isSeeking, songState.isPlaying, songState.songId]);
+
+    useEffect(() => {
+        setPosition(songState.position / 1000);
+    }, [songState.position]);
 
     return (
         <div className="w-full flex items-center justify-between gap-2">

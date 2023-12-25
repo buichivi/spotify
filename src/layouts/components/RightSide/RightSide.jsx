@@ -13,6 +13,7 @@ const RightSide = ({ children }) => {
     const [isMainContent, setIsMainContent] = useState(false);
     const [content, setContent] = useState('');
     const nav = useRef();
+    const mainContentDiv = useRef();
     const spotifyApi = useSpotifyApi();
 
     useEffect(() => {
@@ -45,16 +46,28 @@ const RightSide = ({ children }) => {
                 setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/playlist')) {
                 contentID = location.pathname.split('/playlist/')[1];
+                const playlist = await spotifyApi.getPlaylist(contentID);
+                setContent(playlist.body);
+                const color = await Vibrant.from(
+                    playlist.body.images[0].url,
+                ).getPalette();
+                setNavColor(color.Vibrant.getHex());
             }
         };
         if (!spotifyApi.error) {
             getNavColor();
         }
     }, [location, spotifyApi]);
+
+
+    useEffect(() => {
+        mainContentDiv.current.scrollTop = 0;
+    }, [location.pathname])
     return (
         <>
             <NavBar ref={nav} isHide={isHidePlayBtn} currentContent={content} />
             <div
+                ref={mainContentDiv}
                 className="h-full overflow-y-auto overflow-x-hidden"
                 onScroll={(e) => {
                     let scrollTop = 0;

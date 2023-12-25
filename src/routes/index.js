@@ -19,7 +19,7 @@ const publicRoutes = [
         element: Collection
     },
     {
-        path: '/playlist',
+        path: '/playlist/:id',
         element: Playlist
     },
     {

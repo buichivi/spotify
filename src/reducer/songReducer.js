@@ -13,9 +13,13 @@ export const initSongState = {
     position: 0,
     volume: 50,
     context: {
-        artist: [],
-        album: {},
-        playlist: {},
+        context_uri: '',
+        option: {
+            uris: [],
+            offset: {
+                uri: '',
+            },
+        },
     },
 };
 
@@ -31,24 +35,20 @@ export const songReducer = (state, action) => {
                 ...state,
                 ...action.payLoad,
             };
-        case 'SET_PLAYING_STATE':
+        case 'SET_CONTEXT':
+            // ! Nên chỉ để context
             return {
                 ...state,
-                isPlaying: action.payLoad.isPlaying,
                 context: {
-                    album: { ...state.context.album },
-                    playlist: { ...state.context.playlist },
-                    artist: [
-                        ...state.context.artist,
-                        ...action.payLoad.context_artist,
-                    ],
+                    context_uri: action.payLoad.context.context_uri,
+                    option: action.payLoad.context.option,
                 },
             };
-        case 'SET_USER': 
+        case 'SET_USER':
             return {
                 ...state,
-                user: { ...action.payLoad }
-            }
+                user: { ...action.payLoad },
+            };
         default:
             return state;
     }

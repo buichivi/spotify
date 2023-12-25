@@ -1,11 +1,46 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { MusicIcon, VolumnIcon } from '../Icons';
+import { useEffect, useRef, useState } from 'react';
 
-const LibraryItem = ({ data, isActive, isPlaying }) => {
+const LibraryItem = ({
+    data = {},
+    isActive = false,
+    isPlaying = false,
+    owner = '',
+}) => {
+    const librayItem = useRef();
+    const location = useLocation();
+    const [id, setId] = useState('');
+
+    useEffect(() => {
+        if (isActive) {
+            librayItem.current.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'start',
+            });
+        }
+    }, [isActive]);
+
+    useEffect(() => {
+        setId(location.pathname.split('/')[2]);
+    }, [location]);
+
     return (
         <Link
-            className="w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md hover:bg-[#393939] flex gap-3 items-center justify-between"
+            ref={librayItem}
+            className={`w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md flex gap-3 items-center justify-between`}
             to={`/${data?.type}/${data?.id}`}
+            style={{
+                backgroundColor: id == data?.id && '#232323',
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.background =
+                    id == data.id ? '#393939' : '#1a1a1a';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.background =
+                    id == data.id ? '#232323' : 'transparent';
+            }}
         >
             <div className="w-12 h-12 flex-shrink-0 rounded-md overflow-hidden">
                 {data?.imageUrl ? (
@@ -37,9 +72,15 @@ const LibraryItem = ({ data, isActive, isPlaying }) => {
                 >
                     {data?.name}
                 </h4>
-                <span className="text-climp-1 text-[#8c8c8c] text-sm capitalize font-light">
-                    {data?.type}
-                </span>
+                <div className="text-climp-1 text-[#8c8c8c] text-sm font-light">
+                    <span className='capitalize'>{data?.type}</span>
+                    {owner && (
+                        <>
+                            <span className='before:content-["•"] before:text-[8px] before:top-1/2 before:-translate-x-1/2 mx-1 relative font-light'></span>
+                            <span>{owner}</span>
+                        </>
+                    )}
+                </div>
             </div>
             {isPlaying && (
                 <div>

@@ -14,49 +14,52 @@ const Artist = () => {
     const [artist, setArtist] = useState({});
     const [topTracks, setTopTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
+    const [savedTracks, setSavedTracks] = useState([])
     const [isFollow, setIsFollow] = useState(false);
     const songItems = useRef([]);
     const spotifyApi = useSpotifyApi();
     const context = topTracks.map((track) => {
         return track?.uri;
     });
+    const trackIds = topTracks.map(track => track?.id)
 
-    const handlePlayAndResume = async (e) => {
-        const artistId = e.currentTarget.parentElement.dataset.id;
-        const idx = context.indexOf(songState.uri);
-        const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
+    const idx = context.indexOf(songState.uri);
+    // ? Nên chỉ để new_queue từ bài click chạy đến cuối không cần lặp lại
+    const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
 
+    const handlePlayAndResume = async () => {
+        const optionPlay =
+            songState?.context?.context_uri == artist?.uri
+                ? {
+                    uris: songState?.context?.option?.uris,
+                }
+                : {
+                    uris: context,
+                };
         spotifyApi
             .play({
                 device_id: songState.deviceId,
-                uris: songState.artistIds.includes(artistId)
-                    ? new_queue
-                    : context,
-                position_ms: songState.artistIds.includes(artistId)
-                    ? songState.position
-                    : 0,
+                ...optionPlay,
+                position_ms:
+                    songState?.context?.context_uri == artist?.uri
+                        ? songState.position
+                        : 0,
             })
             .then(() => {
                 dispatchSongState({
-                    type: 'SET_PLAYING_STATE',
+                    type: 'SET_CONTEXT',
                     payLoad: {
-                        isPlaying: true,
-                        context_artist: [],
+                        context: {
+                            context_uri: artist?.uri,
+                            option: optionPlay,
+                        },
                     },
                 });
             });
     };
 
     const handlePause = () => {
-        spotifyApi.pause().then(() => {
-            dispatchSongState({
-                type: 'SET_PLAYING_STATE',
-                payLoad: {
-                    isPlaying: false,
-                    context_artist: [],
-                },
-            });
-        });
+        spotifyApi.pause();
     };
 
     useEffect(() => {
@@ -71,8 +74,15 @@ const Artist = () => {
             setIsFollow(isFolllow.body[0]);
         };
 
+        const getSavedTracks = async (trackIds = []) => {
+            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds)
+            setSavedTracks(savedTracks.body);
+        }
+
         const getTopTracks = async () => {
             const topTracks = await spotifyApi.getArtistTopTracks(id, 'VN');
+            const trackIds = topTracks.body.tracks.map((track) => track.id)
+            getSavedTracks(trackIds);
             setTopTracks(topTracks.body.tracks);
         };
         if (!spotifyApi.error) {
@@ -81,12 +91,35 @@ const Artist = () => {
         }
     }, [spotifyApi, id]);
 
+    useEffect(() => {
+        if (
+            songState?.artistIds?.includes(id) &&
+            artist?.uri &&
+            songState?.context?.context_uri == artist.uri
+        ) {
+            dispatchSongState({
+                type: 'SET_CONTEXT',
+                payLoad: {
+                    context: {
+                        context_uri: artist?.uri,
+                        option: {
+                            uris: new_queue,
+                        },
+                    },
+                },
+            });
+        }
+    }, [songState.songId, id]);
+
     return (
         <div className="h-auto w-full -mt-nav">
             <div
-                className="px-6 pb-8 min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] w-full flex items-end"
+                className="px-6 pb-8 min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] w-full flex items-end
+                    bg-gradient-to-b from-[#121212] from-[99%] to-[#121212] to-[99%]
+                "
                 style={{
-                    backgroundColor: mainColor,
+                    '--tw-gradient-from': mainColor,
+                    '--tw-gradient-to': mainColor + '90'
                 }}
             >
                 <div className="flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-full shadow-blur-xl overflow-hidden">
@@ -130,19 +163,17 @@ const Artist = () => {
             <div
                 className="h-auto bg-gradient-to-b from-[#121212] from-[200px] to-[#121212 to-[200px] opacity-90 sticky top-0"
                 style={{
-                    '--tw-gradient-from': mainColor,
+                    '--tw-gradient-from': mainColor + '70',
                 }}
             >
                 <div className="h-auto p-[18px] flex items-center relative">
-                    <button
-                        className="flex-shrink-0 flex items-center justify-center w-[56px] h-[56px] bg-[#1db954] text-black rounded-full hover:scale-105 transition mr-8 overflow-hidden"
-                        data-id={id}
-                    >
+                    <button className="flex-shrink-0 flex items-center justify-center w-[56px] h-[56px] bg-[#1db954] text-black rounded-full hover:scale-105 transition mr-8 overflow-hidden">
                         <div
                             className="p-[100%]"
                             style={{
                                 display:
-                                    songState?.artistIds?.includes(id) &&
+                                    songState?.context?.context_uri ==
+                                        artist?.uri &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
@@ -150,7 +181,7 @@ const Artist = () => {
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.artistIds?.includes(id) &&
+                        {songState?.context?.context_uri == artist?.uri &&
                             songState?.isPlaying == true && (
                                 <div className="p-[100%]" onClick={handlePause}>
                                     <PauseIcon />
@@ -205,6 +236,10 @@ const Artist = () => {
                                         orderNum={index + 1}
                                         trackData={track}
                                         context={context}
+                                        artistUri={artist?.uri}
+                                        isArtist
+                                        isHideArtists
+                                        isSaved={savedTracks[index]}
                                     />
                                 </div>
                             );

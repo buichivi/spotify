@@ -21,49 +21,103 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     const { songState, dispatchSongState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
     console.log('Navbar render');
-    const context = topTracks.map((track) => {
-        return track?.uri;
-    });
 
-    const handlePlayAndResume = async (e) => {
-        const artistId = e.currentTarget.parentElement.dataset.id;
-        const idx = context.indexOf(songState.uri);
-        const new_queue = [...context.slice(idx), ...context.slice(0, idx)];
+    const handlePlayAndResume = async () => {
+        var optionPlay = {};
+        var payLoad = {};
+        if (currentContent?.type == 'artist') {
+            optionPlay =
+                songState?.context?.context_uri == currentContent?.uri
+                    ? {
+                        uris: songState?.context?.option?.uris,
+                    }
+                    : {
+                        context_uri: currentContent?.uri,
+                    };
+            payLoad =
+                songState?.context?.context_uri == currentContent?.uri
+                    ? {
+                        context: {
+                            context_uri: songState?.context?.context_uri,
+                            option: {
+                                uris: songState?.context?.option?.uris,
+                            },
+                        },
+                    }
+                    : {
+                        context: {
+                            context_uri: currentContent?.uri,
+                            option: {
+                                uris: [topTracks[0]?.uri],
+                            },
+                        },
+                    };
+        } else if (
+            currentContent?.type == 'album' ||
+            currentContent?.type == 'playlist'
+        ) {
+            console.log(currentContent?.tracks?.items[0]?.track);
+            optionPlay =
+                songState?.context?.context_uri == currentContent?.uri
+                    ? {
+                        context_uri: songState?.context?.context_uri,
+                        offset: songState?.context?.option?.offset,
+                    }
+                    : {
+                        context_uri: currentContent?.uri,
+                        offset: {
+                            uri:
+                                currentContent?.type == 'album'
+                                    ? currentContent?.tracks?.items[0]?.uri
+                                    : currentContent?.tracks?.items[0]?.track
+                                        ?.uri,
+                        },
+                    };
+            payLoad =
+                songState?.context?.context_uri == currentContent?.uri
+                    ? {
+                        context: {
+                            context_uri: songState?.context?.context_uri,
+                            option: {
+                                offset: songState?.context?.option?.offset,
+                            },
+                        },
+                    }
+                    : {
+                        context: {
+                            context_uri: currentContent?.uri,
+                            option: {
+                                offset: {
+                                    uri: currentContent?.type == 'album'
+                                    ? currentContent?.tracks?.items[0]?.uri
+                                    : currentContent?.tracks?.items[0]?.track
+                                        ?.uri,
+                                },
+                            },
+                        },
+                    };
+        }
 
         spotifyApi
             .play({
                 device_id: songState.deviceId,
-                uris: songState.artistIds.includes(artistId)
-                    ? new_queue
-                    : context,
-                position_ms: songState.artistIds.includes(artistId)
-                    ? songState.position
-                    : 0,
+                ...optionPlay,
+                position_ms:
+                    songState?.context?.context_uri == currentContent?.uri
+                        ? songState.position
+                        : 0,
             })
             .then(() => {
                 dispatchSongState({
-                    type: 'SET_PLAYING_STATE',
-                    payLoad: {
-                        isPlaying: true,
-                        context_artist: [],
-                    },
+                    type: 'SET_CONTEXT',
+                    payLoad: payLoad,
                 });
             });
     };
 
     const handlePause = () => {
-        spotifyApi.pause().then(() => {
-            dispatchSongState({
-                type: 'SET_PLAYING_STATE',
-                payLoad: {
-                    isPlaying: false,
-                    context_artist: [],
-                },
-            });
-        });
+        spotifyApi.pause();
     };
-
-
 
     useEffect(() => {
         const loadArtistTopTracks = async () => {
@@ -109,15 +163,13 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                         pointerEvents: isHide == true ? 'none' : 'all',
                     }}
                 >
-                    <button
-                        className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition overflow-hidden"
-                        data-id={currentContent?.id}
-                    >
+                    <button className="w-[48px] h-[48px] flex-shrink-0 bg-[#1db954] text-black rounded-full flex items-center justify-center hover:scale-105 transition overflow-hidden">
                         <div
                             className="p-[100%]"
                             style={{
                                 display:
-                                    typeIds?.includes(currentContent?.id) &&
+                                    songState?.context?.context_uri ==
+                                        currentContent?.uri &&
                                     songState.isPlaying == true &&
                                     'none',
                             }}
@@ -125,7 +177,8 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                         >
                             <PlayIcon />
                         </div>
-                        {typeIds?.includes(currentContent?.id) &&
+                        {songState?.context?.context_uri ==
+                            currentContent?.uri &&
                             songState.isPlaying == true && (
                                 <div className="p-[100%]" onClick={handlePause}>
                                     <PauseIcon />

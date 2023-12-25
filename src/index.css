@@ -1,4 +1,5 @@
 @import 'normalize.css';
+@import 'overlayscrollbars/overlayscrollbars.css';
 
 @tailwind base;
 @tailwind components;

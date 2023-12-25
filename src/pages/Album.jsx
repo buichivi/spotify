@@ -14,6 +14,7 @@ const Album = () => {
     const { dispatchLibraryState } = useLibraryReducer();
     const [album, setAlbum] = useState({});
     const [isSaved, setIsSaved] = useState(false);
+    const [savedTracks, setSavedTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
     const spotifyApi = useSpotifyApi();
     const totalTime = album?.tracks?.items?.reduce((acc, item) => {
@@ -70,7 +71,14 @@ const Album = () => {
             ).getPalette();
             setMainColor(color.DarkVibrant.getHex());
             setAlbum(album.body);
+            const trackIds = album?.body?.tracks?.items?.map(item => item.id)
+            getSavedTracks(trackIds)
         };
+
+        const getSavedTracks = async (trackIds = []) => {
+            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds)
+            setSavedTracks(savedTracks.body);
+        }
 
         const isLikeAlbum = async () => {
             const isSaved = await spotifyApi.containsMySavedAlbums([id]);
@@ -105,7 +113,7 @@ const Album = () => {
         }
     }, [songState.songId, album.uri]);
 
-    console.log(album);
+    // console.log(album);
 
     return (
         <div className="h-auto w-full -mt-nav">
@@ -210,7 +218,7 @@ const Album = () => {
                                             name: album?.name,
                                             type: album?.type,
                                             uri: album?.uri,
-                                            owner: album?.artists[0].name
+                                            owner: album?.artists[0].name,
                                         },
                                     });
                                 });
@@ -254,6 +262,7 @@ const Album = () => {
                                         isHideImg
                                         isAlbum
                                         albumUri={album?.uri}
+                                        isSaved={savedTracks[index]}
                                     />
                                 </div>
                             );

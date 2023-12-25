@@ -12,6 +12,7 @@ const Playlist = () => {
     const { songState, dispatchSongState } = useSongReducer();
     const [playlist, setPlaylist] = useState({});
     const [mainColor, setMainColor] = useState('');
+    const [savedTracks, setSavedTracks] = useState([]);
     const spotifyApi = useSpotifyApi();
     const totalTime = playlist?.tracks?.items?.reduce((acc, item) => {
         return acc + Number(item?.track?.duration_ms);
@@ -24,13 +25,13 @@ const Playlist = () => {
         const optionPlay =
             playlist?.uri == songState?.context?.context_uri
                 ? {
-                      context_uri: songState?.context?.context_uri,
-                      offset: songState?.context?.option?.offset,
-                  }
+                    context_uri: songState?.context?.context_uri,
+                    offset: songState?.context?.option?.offset,
+                }
                 : {
-                      context_uri: playlist?.uri,
-                      offset: { uri: playlist?.tracks?.items[0]?.track?.uri },
-                  };
+                    context_uri: playlist?.uri,
+                    offset: { uri: playlist?.tracks?.items[0]?.track?.uri },
+                };
         spotifyApi
             .play({
                 device_id: songState.deviceId,
@@ -65,9 +66,17 @@ const Playlist = () => {
             const color = await Vibrant.from(
                 playlist.body.images[0].url,
             ).getPalette();
-            console.log(playlist);
             setMainColor(color.Vibrant.getHex());
             setPlaylist(playlist.body);
+            const trackIds = playlist?.body?.tracks?.items?.map(item => item?.track?.id)
+            getSavedTracks(trackIds)
+        };
+
+        const getSavedTracks = async (trackIds = []) => {
+            const savedTracks = await spotifyApi.containsMySavedTracks(
+                trackIds,
+            );
+            setSavedTracks(savedTracks.body);
         };
 
         if (!spotifyApi.error) {
@@ -181,7 +190,7 @@ const Playlist = () => {
                         <span className="hidden xl:inline-block flex-1 text-sm font-light">
                             Date added
                         </span>
-                        <span>
+                        <span className="w-[120px] flex flex-shrink-0 items-center justify-end">
                             <ClockIcon width={16} height={16} />
                         </span>
                     </div>
@@ -196,6 +205,7 @@ const Playlist = () => {
                                         playlistUri={playlist?.uri}
                                         dateAdded={item?.added_at}
                                         isPlaylist
+                                        isSaved={savedTracks[index]}
                                     />
                                 </div>
                             );

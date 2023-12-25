@@ -1,9 +1,24 @@
+import Vibrant from 'node-vibrant';
+import { useEffect, useState } from 'react';
 import GenreItem from '~/components/GenreItem';
 import HistorySearch from '~/components/HistorySearch';
+import useSpotifyApi from '~/hooks/useSpotifyApi';
 
 const Search = () => {
     document.title = 'Spotify - Search';
-    
+    const [genres, setGenres] = useState([]);
+    const spotifyApi = useSpotifyApi();
+
+    useEffect(() => {
+        const getGenres = async () => {
+            const genres = await spotifyApi.getCategories({ limit: 50 });
+            setGenres(genres.body.categories.items);
+        };
+        if (!spotifyApi.error) {
+            getGenres();
+        }
+    }, [spotifyApi]);
+
     return (
         <div className="px-6">
             <HistorySearch />
@@ -11,54 +26,18 @@ const Search = () => {
                 <h3 className="h-[45px] text-2xl font-bold text-white">
                     Browse all
                 </h3>
-                <div className="grid grid-cols-5 2xl:grid-cols-8 gap-3">
-                    <GenreItem
-                        className=""
-                        title="Pop"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="Ballad"
-                        color={'bg-purple-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="Vietnamese Music"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="Comedy"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="Discover"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="Rock"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
-                    <GenreItem
-                        className=""
-                        title="R&B"
-                        color={'bg-green-500'}
-                        thumbImg="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa"
-                    />
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-8 gap-3">
+                    {genres.map((genre, index) => {
+                        return (
+                            <GenreItem
+                                key={index}
+                                genreData={genre}
+                            />
+                        );
+                    })}
                 </div>
             </div>
-            <div>
-                
-            </div>
+            <div></div>
         </div>
     );
 };

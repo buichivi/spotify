@@ -14,7 +14,7 @@ const MainLayout = ({ children }) => {
                             <LeftSide />
                         </div>
                         <div className="resize-bar"></div>
-                        <div className="flex-auto bg-[#121212] rounded-md relative overflow-hidden">
+                        <div className="flex-auto bg-[#121212] rounded-md relative">
                             <RightSide>{children}</RightSide>
                         </div>
                     </LibraryProvider>

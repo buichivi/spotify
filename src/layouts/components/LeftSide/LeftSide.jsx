@@ -1,4 +1,4 @@
-import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 import { useRef } from 'react';
 import { LanguageIcon, LibraryIcon, PlusIcon } from '~/components/Icons';
 import LeftsideFooter from '~/components/LeftsideFooter';
@@ -24,7 +24,7 @@ const LeftSide = () => {
             <div className="w-full h-auto bg-[#121212] rounded-md">
                 <Menu />
             </div>
-            <div className="w-full flex-auto flex flex-col justify-between overflow-hidden bg-[#121212] rounded-md">
+            <div className="w-full flex-auto flex flex-col justify-between bg-[#121212] rounded-md">
                 <header className="h-[56px] flex items-center justify-between py-2 px-4 text-[#a7a7a7]">
                     <div className="flex items-center px-2 py-1 hover:text-white transition cursor-pointer">
                         <LibraryIcon />
@@ -39,102 +39,109 @@ const LeftSide = () => {
                 <div className="relative h-[132px] flex-auto">
                     <span
                         ref={shadow}
-                        className="absolute w-full h-2 bg-transparent -top-2 left-0 shadow-blur hidden"
+                        className="absolute w-full h-2 bg-transparent -top-2 left-0 shadow-blur hidden z-10"
                     ></span>
                     <OverlayScrollbarsComponent
                         element="div"
+                        options={{
+                        scrollbars: { theme: '', autoHide: 'leave', autoHideDelay: 1000 },
+                            overflow: { x: 'hidden' },
+                        }}
+                        events={{ scroll: (instance, e) => handleScroll(e) }}
                         defer
-                        in
+                        className="w-full h-full p-2"
                     >
-                        <div
-                            className="w-full h-full p-2"
+                        {/* <div
+                            className="w-full h-full p-2 overflow-y-auto"
                             onScroll={handleScroll}
-                        >
-                            <div className="w-full h-full flex flex-col justify-between">
-                                {songState.user.name == '' ? (
-                                    <>
-                                        <div className="w-full h-[134px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
-                                            <div className="w-full h-[50px] flex flex-col justify-between">
-                                                <h3 className="font-semibold">
-                                                    Create your first playlist
-                                                </h3>
-                                                <span className="text-sm">
-                                                    It's easy, we'll help you
-                                                </span>
-                                            </div>
-                                            <button className="w-[126px] h-8 px-4 py-1 rounded-full bg-white text-black text-sm leading-8 font-medium hover:bg-[#b3b3b3] hover:scale-105 transition">
-                                                <span className="relative -top-[2px]">
-                                                    Create playlist
-                                                </span>
-                                            </button>
+                        > */}
+                        <div className="w-full h-full flex flex-col justify-between">
+                            {songState.user.name == '' ? (
+                                <>
+                                    <div className="w-full h-[134px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
+                                        <div className="w-full h-[50px] flex flex-col justify-between">
+                                            <h3 className="font-semibold">
+                                                Create your first playlist
+                                            </h3>
+                                            <span className="text-sm font-light">
+                                                It's easy, we'll help you
+                                            </span>
                                         </div>
-                                        <div className="w-full h-[176px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
-                                            <div className="w-full h-[92px] flex flex-col justify-between">
-                                                <h3 className="font-semibold">
-                                                    Let's find some podcasts to
-                                                    follow
-                                                </h3>
-                                                <span className="text-sm">
-                                                    We'll keep you updated on new
-                                                    episodes
-                                                </span>
-                                            </div>
-                                            <button className="inline-flex w-[142px] h-8 px-4 py-1 rounded-full bg-white text-black text-sm leading-8 font-medium hover:bg-[#b3b3b3] hover:scale-105 transition">
-                                                <span className="relative -top-[2px]">
-                                                    Browse podcasts
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full">
-                                        <LibraryItem
-                                            data={{
-                                                type: 'collection',
-                                                id: 'tracks',
-                                                imageUrl: 'https://t.ly/1m3eT',
-                                                name: 'Liked songs'
-                                            }}
-                                            owner={savedTracks + ' song' + (savedTracks > 2 ? 's' : '')}
-                                        />
-                                        {artists.length > 0 &&
-                                            playlists
-                                                .concat(albums, artists)
-                                                .map((item, index) => {
-                                                    return (
-                                                        <div
-                                                            key={index}
-                                                            className="w-full h-auto"
-                                                        >
-                                                            <LibraryItem
-                                                                data={item}
-                                                                isActive={
-                                                                    songState
-                                                                        ?.context
-                                                                        ?.context_uri ==
-                                                                    item?.uri
-                                                                }
-                                                                isPlaying={
-                                                                    songState
-                                                                        ?.context
-                                                                        ?.context_uri ==
-                                                                        item?.uri &&
-                                                                    songState.isPlaying
-                                                                }
-                                                                owner={item?.owner}
-                                                            />
-                                                        </div>
-                                                    );
-                                                })}
+                                        <button className="w-[126px] h-8 px-4 py-1 rounded-full bg-white text-black text-sm leading-8 font-medium hover:bg-[#b3b3b3] hover:scale-105 transition">
+                                            <span className="relative -top-[2px]">
+                                                Create playlist
+                                            </span>
+                                        </button>
                                     </div>
-                                )}
-                            </div>
+                                    <div className="w-full h-[176px] flex flex-col justify-between my-2 py-4 px-5 bg-[#242424] rounded-md">
+                                        <div className="w-full h-[92px] flex flex-col justify-between">
+                                            <h3 className="font-semibold">
+                                                Let's find some podcasts to
+                                                follow
+                                            </h3>
+                                            <span className="text-sm font-light">
+                                                We'll keep you updated on new
+                                                episodes
+                                            </span>
+                                        </div>
+                                        <button className="inline-flex w-[142px] h-8 px-4 py-1 rounded-full bg-white text-black text-sm leading-8 font-medium hover:bg-[#b3b3b3] hover:scale-105 transition">
+                                            <span className="relative -top-[2px]">
+                                                Browse podcasts
+                                            </span>
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="w-full h-full">
+                                    <LibraryItem
+                                        data={{
+                                            type: 'collection',
+                                            id: 'tracks',
+                                            imageUrl: 'https://t.ly/1m3eT',
+                                            name: 'Liked songs',
+                                        }}
+                                        owner={
+                                            savedTracks +
+                                            ' song' +
+                                            (savedTracks > 2 ? 's' : '')
+                                        }
+                                    />
+                                    {artists.length > 0 &&
+                                        playlists
+                                            .concat(albums, artists)
+                                            .map((item, index) => {
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="w-full h-auto"
+                                                    >
+                                                        <LibraryItem
+                                                            data={item}
+                                                            isActive={
+                                                                songState
+                                                                    ?.context
+                                                                    ?.context_uri ==
+                                                                item?.uri
+                                                            }
+                                                            isPlaying={
+                                                                songState
+                                                                    ?.context
+                                                                    ?.context_uri ==
+                                                                    item?.uri &&
+                                                                songState.isPlaying
+                                                            }
+                                                            owner={item?.owner}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                </div>
+                            )}
                         </div>
+                        {/* </div> */}
                     </OverlayScrollbarsComponent>
                 </div>
-                {songState.user.name == '' && (
-                    <LeftsideFooter />
-                )}
+                {!songState.user.name && <LeftsideFooter />}
             </div>
         </>
     );

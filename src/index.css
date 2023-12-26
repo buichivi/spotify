@@ -33,21 +33,27 @@
     }
 
     /* scroll bar */
-    body::-webkit-scrollbar {
+    /* body::-webkit-scrollbar {
         display: none;
-    }
-    ::-webkit-scrollbar {
-        width: 12px;
-    }
-    ::-webkit-scrollbar-thumb {
+    } */
+    
+    /* ::-webkit-scrollbar-thumb {
         background-color: hsla(0, 0%, 100%, 0.3);
-    }
+    } */
 
     a {
         text-decoration: none;
         margin: 0;
         padding: 0;
     }
+}
+
+.os-scrollbar {
+    --os-size: 12px;
+    --os-handle-bg: hsla(0, 0%, 100%, 0.3);
+    --os-handle-bg-hover: hsla(0, 0%, 100%, 0.5);
+    --os-handle-bg-active: hsla(0, 0%, 100%, 0.7);
+    transform: translate(0, 4px);
 }
 
 .top-track-limit-5:nth-child(n + 6) {

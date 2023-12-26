@@ -5,6 +5,7 @@ import Vibrant from 'node-vibrant';
 import useSpotifyApi from '~/hooks/useSpotifyApi';
 import NavBar from '../NavBar';
 import RightSideFooter from '../RightSideFooter';
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 
 const RightSide = ({ children }) => {
     const location = useLocation();
@@ -59,45 +60,60 @@ const RightSide = ({ children }) => {
         }
     }, [location, spotifyApi]);
 
-
     useEffect(() => {
         mainContentDiv.current.scrollTop = 0;
-    }, [location.pathname])
+    }, [location.pathname]);
+
+    const handleScroll = (e) => {
+        let scrollTop = 0;
+        if (isMainContent) {
+            scrollTop = Math.max(340, window.outerHeight * 0.4 + 32);
+        }
+        if (e.currentTarget.scrollTop > scrollTop) {
+            nav.current.style.background = '#121212';
+            if (isMainContent) {
+                nav.current.style.background = navColor;
+                setIsHidePlayBtn(false);
+            }
+        } else {
+            nav.current.style.background = 'transparent';
+            if (isMainContent) {
+                setIsHidePlayBtn(true);
+            }
+        }
+    };
+
     return (
         <>
             <NavBar ref={nav} isHide={isHidePlayBtn} currentContent={content} />
-            <div
-                ref={mainContentDiv}
-                className="h-full overflow-y-auto overflow-x-hidden"
-                onScroll={(e) => {
-                    let scrollTop = 0;
-                    if (isMainContent) {
-                        scrollTop = Math.max(
-                            340,
-                            window.outerHeight * 0.4 + 32,
-                        );
-                    }
-                    if (e.currentTarget.scrollTop > scrollTop) {
-                        nav.current.style.background = '#121212';
-                        if (isMainContent) {
-                            nav.current.style.background = navColor;
-                            setIsHidePlayBtn(false);
-                        }
-                    } else {
-                        nav.current.style.background = 'transparent';
-                        if (isMainContent) {
-                            setIsHidePlayBtn(true);
-                        }
-                    }
+            <OverlayScrollbarsComponent
+                element="div"
+                options={{
+                    scrollbars: {
+                        theme: '',
+                        autoHide: 'leave',
+                        autoHideDelay: 1000,
+                    },
+                    overflow: { x: 'hidden' },
                 }}
+                events={{ scroll: (instance, e) => handleScroll(e) }}
+                defer
+                className="h-full"
+                ref={mainContentDiv}
             >
-                <div className="min-h-[calc(((100vh - 64px) - 90px) - 519px)] pb-8">
-                    <div className="pt-nav">{children}</div>
-                    <div className="pt-10 h-[393px]">
-                        <RightSideFooter />
+                {/* <div
+                    ref={mainContentDiv}
+                    className="h-full overflow-y-auto overflow-x-hidden"
+                    onScroll={handleScroll}
+                > */}
+                    <div className="min-h-[calc(((100vh - 64px) - 90px) - 519px)] pb-8">
+                        <div className="pt-nav">{children}</div>
+                        <div className="pt-10 h-[393px]">
+                            <RightSideFooter />
+                        </div>
                     </div>
-                </div>
-            </div>
+                {/* </div> */}
+            </OverlayScrollbarsComponent>
         </>
     );
 };

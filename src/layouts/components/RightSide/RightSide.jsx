@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import Vibrant from 'node-vibrant';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi } from '~/hooks';
 import NavBar from '../NavBar';
 import RightSideFooter from '../RightSideFooter';
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
@@ -33,25 +33,19 @@ const RightSide = ({ children }) => {
                 contentID = location.pathname.split('/artist/')[1];
                 const artist = await spotifyApi.getArtist(contentID);
                 setContent(artist.body);
-                const color = await Vibrant.from(
-                    artist.body.images[0].url,
-                ).getPalette();
+                const color = await Vibrant.from(artist.body.images[0].url).getPalette();
                 setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/album')) {
                 contentID = location.pathname.split('/album/')[1];
                 const album = await spotifyApi.getAlbum(contentID);
                 setContent(album.body);
-                const color = await Vibrant.from(
-                    album.body.images[0].url,
-                ).getPalette();
+                const color = await Vibrant.from(album.body.images[0].url).getPalette();
                 setNavColor(color.DarkVibrant.getHex());
             } else if (location.pathname.includes('/playlist')) {
                 contentID = location.pathname.split('/playlist/')[1];
                 const playlist = await spotifyApi.getPlaylist(contentID);
                 setContent(playlist.body);
-                const color = await Vibrant.from(
-                    playlist.body.images[0].url,
-                ).getPalette();
+                const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
                 setNavColor(color.Vibrant.getHex());
             }
         };
@@ -61,7 +55,7 @@ const RightSide = ({ children }) => {
     }, [location, spotifyApi]);
 
     useEffect(() => {
-        mainContentDiv.current.scrollTop = 0;
+        console.dir(mainContentDiv.current.getElement().scrollTop);
     }, [location.pathname]);
 
     const handleScroll = (e) => {
@@ -95,24 +89,27 @@ const RightSide = ({ children }) => {
                         autoHideDelay: 1000,
                     },
                     overflow: { x: 'hidden' },
+                    paddingAbsolute: true,
+                    showNativeOverlaidScrollbars: true,
                 }}
-                events={{ scroll: (instance, e) => handleScroll(e) }}
+                events={{
+                    scroll: (instance, e) => {
+                        handleScroll(e);
+                    },
+                    updated: (instance) => {
+                        instance.elements().content.scrollTop = 0;
+                    },
+                }}
                 defer
                 className="h-full"
                 ref={mainContentDiv}
             >
-                {/* <div
-                    ref={mainContentDiv}
-                    className="h-full overflow-y-auto overflow-x-hidden"
-                    onScroll={handleScroll}
-                > */}
-                    <div className="min-h-[calc(((100vh - 64px) - 90px) - 519px)] pb-8">
-                        <div className="pt-nav">{children}</div>
-                        <div className="pt-10 h-[393px]">
-                            <RightSideFooter />
-                        </div>
+                <div className="min-h-[calc(((100vh - 64px) - 90px) - 519px)] pb-8">
+                    <div className="pt-nav">{children}</div>
+                    <div className="pt-10 h-[393px]">
+                        <RightSideFooter />
                     </div>
-                {/* </div> */}
+                </div>
             </OverlayScrollbarsComponent>
         </>
     );

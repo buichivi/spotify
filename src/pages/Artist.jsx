@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi, useSongReducer, useLibraryReducer } from '~/hooks';
 import Vibrant from 'node-vibrant';
 import { PauseIcon, PlayIcon, VerifyIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
-import useSongReducer from '~/hooks/useSongReducer';
-import useLibraryReducer from '~/hooks/useLibraryReducer';
 
 const Artist = () => {
     const { id } = useParams();
@@ -14,14 +12,14 @@ const Artist = () => {
     const [artist, setArtist] = useState({});
     const [topTracks, setTopTracks] = useState([]);
     const [mainColor, setMainColor] = useState('');
-    const [savedTracks, setSavedTracks] = useState([])
+    const [savedTracks, setSavedTracks] = useState([]);
     const [isFollow, setIsFollow] = useState(false);
     const songItems = useRef([]);
     const spotifyApi = useSpotifyApi();
     const context = topTracks.map((track) => {
         return track?.uri;
     });
-    const trackIds = topTracks.map(track => track?.id)
+    const trackIds = topTracks.map((track) => track?.id);
 
     const idx = context.indexOf(songState.uri);
     // ? Nên chỉ để new_queue từ bài click chạy đến cuối không cần lặp lại
@@ -31,19 +29,16 @@ const Artist = () => {
         const optionPlay =
             songState?.context?.context_uri == artist?.uri
                 ? {
-                    uris: songState?.context?.option?.uris,
-                }
+                      uris: songState?.context?.option?.uris,
+                  }
                 : {
-                    uris: context,
-                };
+                      uris: context,
+                  };
         spotifyApi
             .play({
                 device_id: songState.deviceId,
                 ...optionPlay,
-                position_ms:
-                    songState?.context?.context_uri == artist?.uri
-                        ? songState.position
-                        : 0,
+                position_ms: songState?.context?.context_uri == artist?.uri ? songState.position : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -65,9 +60,7 @@ const Artist = () => {
     useEffect(() => {
         const getArtist = async () => {
             const artist = await spotifyApi.getArtist(id);
-            const color = await Vibrant.from(
-                artist.body.images[0].url,
-            ).getPalette();
+            const color = await Vibrant.from(artist.body.images[0].url).getPalette();
             setMainColor(color.DarkVibrant.getHex());
             setArtist(artist.body);
             const isFolllow = await spotifyApi.isFollowingArtists([id]);
@@ -75,13 +68,13 @@ const Artist = () => {
         };
 
         const getSavedTracks = async (trackIds = []) => {
-            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds)
+            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds);
             setSavedTracks(savedTracks.body);
-        }
+        };
 
         const getTopTracks = async () => {
             const topTracks = await spotifyApi.getArtistTopTracks(id, 'VN');
-            const trackIds = topTracks.body.tracks.map((track) => track.id)
+            const trackIds = topTracks.body.tracks.map((track) => track.id);
             getSavedTracks(trackIds);
             setTopTracks(topTracks.body.tracks);
         };
@@ -92,11 +85,7 @@ const Artist = () => {
     }, [spotifyApi, id]);
 
     useEffect(() => {
-        if (
-            songState?.artistIds?.includes(id) &&
-            artist?.uri &&
-            songState?.context?.context_uri == artist.uri
-        ) {
+        if (songState?.artistIds?.includes(id) && artist?.uri && songState?.context?.context_uri == artist.uri) {
             dispatchSongState({
                 type: 'SET_CONTEXT',
                 payLoad: {
@@ -119,16 +108,12 @@ const Artist = () => {
                 "
                 style={{
                     '--tw-gradient-from': mainColor,
-                    '--tw-gradient-to': mainColor + '90'
+                    '--tw-gradient-to': mainColor + '90',
                 }}
             >
                 <div className="flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-full shadow-blur-xl overflow-hidden">
                     <img
-                        src={
-                            artist?.images?.length > 0
-                                ? artist.images[0].url
-                                : ''
-                        }
+                        src={artist?.images?.length > 0 ? artist.images[0].url : ''}
                         alt=""
                         className="w-full h-full object-cover rounded-full"
                     />
@@ -136,27 +121,15 @@ const Artist = () => {
                 <div>
                     <div className="flex items-center">
                         <div className="w-4 h-4 mr-2 flex items-center justify-center bg-white">
-                            <VerifyIcon
-                                className="text-[#3d91f4] flex-shrink-0"
-                                width={24}
-                                height={24}
-                            />
+                            <VerifyIcon className="text-[#3d91f4] flex-shrink-0" width={24} height={24} />
                         </div>
-                        <span className="text-sm relative top-[2px] font-light">
-                            Verified Artist
-                        </span>
+                        <span className="text-sm relative top-[2px] font-light">Verified Artist</span>
                     </div>
                     <div className="mt-1 mb-3 text-[32px] md:text-[60px] xl:text-[96px] capitalize font-extrabold">
                         <h1 className="">{artist?.name}</h1>
                     </div>
                     <div className="text-white mt-1 font-normal text-sm md:text-base">
-                        <span>
-                            {String(artist?.followers?.total).replace(
-                                /\B(?=(\d{3})+(?!\d))/g,
-                                ',',
-                            )}{' '}
-                            followers
-                        </span>
+                        <span>{String(artist?.followers?.total).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} followers</span>
                     </div>
                 </div>
             </div>
@@ -172,8 +145,7 @@ const Artist = () => {
                             className="p-[100%]"
                             style={{
                                 display:
-                                    songState?.context?.context_uri ==
-                                        artist?.uri &&
+                                    songState?.context?.context_uri == artist?.uri &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
@@ -181,12 +153,11 @@ const Artist = () => {
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.context?.context_uri == artist?.uri &&
-                            songState?.isPlaying == true && (
-                                <div className="p-[100%]" onClick={handlePause}>
-                                    <PauseIcon />
-                                </div>
-                            )}
+                        {songState?.context?.context_uri == artist?.uri && songState?.isPlaying == true && (
+                            <div className="p-[100%]" onClick={handlePause}>
+                                <PauseIcon />
+                            </div>
+                        )}
                     </button>
                     <button
                         className="w-fit ring-1 hover:ring-2 hover:scale-105 ring-white transition rounded-full  py-[3px] px-[15px] cursor-pointer text-sm"
@@ -215,9 +186,7 @@ const Artist = () => {
                             }
                         }}
                     >
-                        <span className="relative top-[2px]">
-                            {!isFollow ? 'Follow' : 'Following'}
-                        </span>
+                        <span className="relative top-[2px]">{!isFollow ? 'Follow' : 'Following'}</span>
                     </button>
                 </div>
                 <div className="px-6">
@@ -251,12 +220,9 @@ const Artist = () => {
                             songItems.current.forEach((song) => {
                                 song.classList.toggle('top-track-limit-5');
                             });
-                            e.currentTarget.innerText =
-                                songItems.current[0].classList.contains(
-                                    'top-track-limit-5',
-                                )
-                                    ? 'See more'
-                                    : 'Show less';
+                            e.currentTarget.innerText = songItems.current[0].classList.contains('top-track-limit-5')
+                                ? 'See more'
+                                : 'Show less';
                         }}
                     >
                         See more

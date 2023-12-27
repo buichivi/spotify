@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Category from '~/components/Category';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi } from '~/hooks';
 
 const Home = () => {
     document.title = 'Spotify - Web player: Music for everyone';
@@ -23,11 +23,8 @@ const Home = () => {
     useEffect(() => {
         const loadHomeData = async () => {
             if (!spotifyApi.error) {
-                const featuredPlaylist =
-                    await spotifyApi.getFeaturedPlaylists();
-                const recentTracks = await spotifyApi.getMyRecentlyPlayedTracks(
-                    { limit: 40 },
-                );
+                const featuredPlaylist = await spotifyApi.getFeaturedPlaylists();
+                const recentTracks = await spotifyApi.getMyRecentlyPlayedTracks({ limit: 40 });
                 setRecommenedPlaylists(featuredPlaylist.body.playlists);
                 setRecentAlbums(recentTracks.body.items);
             }

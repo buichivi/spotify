@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi, useSongReducer, useLibraryReducer } from '~/hooks';
 import Vibrant from 'node-vibrant';
 import { ClockIcon, HeartIcon, PauseIcon, PlayIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
-import useSongReducer from '~/hooks/useSongReducer';
 import { convertDurationToText, convertDateString } from '~/utils';
-import useLibraryReducer from '~/hooks/useLibraryReducer';
 
 const Album = () => {
     const { id } = useParams();
@@ -39,10 +37,7 @@ const Album = () => {
             .play({
                 device_id: songState.deviceId,
                 ...optionPlay,
-                position_ms:
-                    songState?.context?.context_uri == album?.uri
-                        ? songState.position
-                        : 0,
+                position_ms: songState?.context?.context_uri == album?.uri ? songState.position : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -66,19 +61,17 @@ const Album = () => {
     useEffect(() => {
         const getAlbum = async () => {
             const album = await spotifyApi.getAlbum(id);
-            const color = await Vibrant.from(
-                album.body.images[0].url,
-            ).getPalette();
+            const color = await Vibrant.from(album.body.images[0].url).getPalette();
             setMainColor(color.DarkVibrant.getHex());
             setAlbum(album.body);
-            const trackIds = album?.body?.tracks?.items?.map(item => item.id)
-            getSavedTracks(trackIds)
+            const trackIds = album?.body?.tracks?.items?.map((item) => item.id);
+            getSavedTracks(trackIds);
         };
 
         const getSavedTracks = async (trackIds = []) => {
-            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds)
+            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds);
             setSavedTracks(savedTracks.body);
-        }
+        };
 
         const isLikeAlbum = async () => {
             const isSaved = await spotifyApi.containsMySavedAlbums([id]);
@@ -92,11 +85,7 @@ const Album = () => {
     }, [spotifyApi, id]);
 
     useEffect(() => {
-        if (
-            id === songState.albumId &&
-            album.uri &&
-            songState?.context?.context_uri == album.uri
-        ) {
+        if (id === songState.albumId && album.uri && songState?.context?.context_uri == album.uri) {
             dispatchSongState({
                 type: 'SET_CONTEXT',
                 payLoad: {
@@ -128,17 +117,13 @@ const Album = () => {
             >
                 <div className=" flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-md shadow-blur-xl overflow-hidden">
                     <img
-                        src={
-                            album?.images?.length > 0 ? album.images[0].url : ''
-                        }
+                        src={album?.images?.length > 0 ? album.images[0].url : ''}
                         alt=""
                         className="w-full h-full object-cover"
                     />
                 </div>
                 <div>
-                    <div className="flex items-center font-light text-sm capitalize">
-                        {album?.album_type}
-                    </div>
+                    <div className="flex items-center font-light text-sm capitalize">{album?.album_type}</div>
                     <div className="mt-1 mb-3 text-[18px] md:text-[34px] xl:text-[48px] capitalize font-extrabold">
                         <h1 className="">{album?.name}</h1>
                     </div>
@@ -146,10 +131,7 @@ const Album = () => {
                         {album?.artists?.map((artist, index) => {
                             return (
                                 <div key={index}>
-                                    <Link
-                                        to={`/artist/${artist.id}`}
-                                        className="text-sm font-bold hover:underline"
-                                    >
+                                    <Link to={`/artist/${artist.id}`} className="text-sm font-bold hover:underline">
                                         {artist.name}
                                     </Link>
                                     {index <= album?.artists?.length - 2 && (
@@ -168,10 +150,7 @@ const Album = () => {
                                 {album?.total_tracks} song
                                 {album?.total_tracks >= 2 && 's'},
                             </span>
-                            <span className="text-sm font-light">
-                                {' '}
-                                {convertDurationToText(totalTime)}
-                            </span>
+                            <span className="text-sm font-light"> {convertDurationToText(totalTime)}</span>
                         </div>
                     </div>
                 </div>
@@ -189,20 +168,18 @@ const Album = () => {
                             onClick={handlePlayAndResume}
                             style={{
                                 display:
-                                    songState?.context?.context_uri ==
-                                        album?.uri &&
+                                    songState?.context?.context_uri == album?.uri &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.context?.context_uri == album?.uri &&
-                            songState?.isPlaying == true && (
-                                <div className="p-[100%]" onClick={handlePause}>
-                                    <PauseIcon />
-                                </div>
-                            )}
+                        {songState?.context?.context_uri == album?.uri && songState?.isPlaying == true && (
+                            <div className="p-[100%]" onClick={handlePause}>
+                                <PauseIcon />
+                            </div>
+                        )}
                     </button>
                     <div
                         className="text-[#a7a7a7] hover:text-white cursor-pointer"
@@ -223,22 +200,18 @@ const Album = () => {
                                     });
                                 });
                             } else {
-                                spotifyApi
-                                    .removeFromMySavedAlbums([id])
-                                    .then(() => {
-                                        setIsSaved(false);
-                                        dispatchLibraryState({
-                                            type: 'REMOVE_ALBUM',
-                                            payLoad: id,
-                                        });
+                                spotifyApi.removeFromMySavedAlbums([id]).then(() => {
+                                    setIsSaved(false);
+                                    dispatchLibraryState({
+                                        type: 'REMOVE_ALBUM',
+                                        payLoad: id,
                                     });
+                                });
                             }
                         }}
                     >
                         <HeartIcon
-                            className={`w-6 h-6 md:w-8 md:h-8 ${
-                                isSaved && 'text-[#1db954]'
-                            }`}
+                            className={`w-6 h-6 md:w-8 md:h-8 ${isSaved && 'text-[#1db954]'}`}
                             isLiked={isSaved}
                         />
                     </div>

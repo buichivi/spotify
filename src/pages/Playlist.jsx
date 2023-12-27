@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi, useSongReducer } from '~/hooks';
 import Vibrant from 'node-vibrant';
 import { ClockIcon, PauseIcon, PlayIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
-import useSongReducer from '~/hooks/useSongReducer';
 import { convertDurationToText } from '~/utils';
 
 const Playlist = () => {
@@ -25,21 +24,18 @@ const Playlist = () => {
         const optionPlay =
             playlist?.uri == songState?.context?.context_uri
                 ? {
-                    context_uri: songState?.context?.context_uri,
-                    offset: songState?.context?.option?.offset,
-                }
+                      context_uri: songState?.context?.context_uri,
+                      offset: songState?.context?.option?.offset,
+                  }
                 : {
-                    context_uri: playlist?.uri,
-                    offset: { uri: playlist?.tracks?.items[0]?.track?.uri },
-                };
+                      context_uri: playlist?.uri,
+                      offset: { uri: playlist?.tracks?.items[0]?.track?.uri },
+                  };
         spotifyApi
             .play({
                 device_id: songState.deviceId,
                 ...optionPlay,
-                position_ms:
-                    songState?.context?.context_uri == playlist?.uri
-                        ? songState.position
-                        : 0,
+                position_ms: songState?.context?.context_uri == playlist?.uri ? songState.position : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -63,19 +59,15 @@ const Playlist = () => {
     useEffect(() => {
         const getPlaylist = async () => {
             const playlist = await spotifyApi.getPlaylist(id);
-            const color = await Vibrant.from(
-                playlist.body.images[0].url,
-            ).getPalette();
+            const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
             setMainColor(color.Vibrant.getHex());
             setPlaylist(playlist.body);
-            const trackIds = playlist?.body?.tracks?.items?.map(item => item?.track?.id)
-            getSavedTracks(trackIds)
+            const trackIds = playlist?.body?.tracks?.items?.map((item) => item?.track?.id);
+            getSavedTracks(trackIds);
         };
 
         const getSavedTracks = async (trackIds = []) => {
-            const savedTracks = await spotifyApi.containsMySavedTracks(
-                trackIds,
-            );
+            const savedTracks = await spotifyApi.containsMySavedTracks(trackIds);
             setSavedTracks(savedTracks.body);
         };
 
@@ -115,27 +107,18 @@ const Playlist = () => {
             >
                 <div className=" flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-md shadow-blur-xl overflow-hidden">
                     <img
-                        src={
-                            playlist?.images?.length > 0
-                                ? playlist.images[0].url
-                                : ''
-                        }
+                        src={playlist?.images?.length > 0 ? playlist.images[0].url : ''}
                         alt=""
                         className="w-full h-full object-cover"
                     />
                 </div>
                 <div>
-                    <div className="flex items-center font-light text-sm capitalize">
-                        {playlist?.type}
-                    </div>
+                    <div className="flex items-center font-light text-sm capitalize">{playlist?.type}</div>
                     <div className="mt-1 mb-3 text-[18px] md:text-[34px] xl:text-[48px] capitalize font-extrabold">
                         <h1 className="">{playlist?.name}</h1>
                     </div>
                     <div className="min-w-[470px] text-white mt-1 font-normal flex items-end">
-                        <Link
-                            to={`/user/${playlist?.owner?.id}`}
-                            className="text-sm hover:underline"
-                        >
+                        <Link to={`/user/${playlist?.owner?.id}`} className="text-sm hover:underline">
                             {playlist?.owner?.display_name}
                         </Link>
                         <div>
@@ -143,10 +126,7 @@ const Playlist = () => {
                                 {playlist?.tracks?.total} song
                                 {playlist?.tracks?.total >= 2 && 's'},
                             </span>
-                            <span className="text-sm font-light">
-                                {' '}
-                                {convertDurationToText(totalTime)}
-                            </span>
+                            <span className="text-sm font-light"> {convertDurationToText(totalTime)}</span>
                         </div>
                     </div>
                 </div>
@@ -164,32 +144,26 @@ const Playlist = () => {
                             onClick={handlePlayAndResume}
                             style={{
                                 display:
-                                    songState?.context?.context_uri ==
-                                        playlist?.uri &&
+                                    songState?.context?.context_uri == playlist?.uri &&
                                     songState?.isPlaying == true &&
                                     'none',
                             }}
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.context?.context_uri == playlist?.uri &&
-                            songState?.isPlaying == true && (
-                                <div className="p-[100%]" onClick={handlePause}>
-                                    <PauseIcon />
-                                </div>
-                            )}
+                        {songState?.context?.context_uri == playlist?.uri && songState?.isPlaying == true && (
+                            <div className="p-[100%]" onClick={handlePause}>
+                                <PauseIcon />
+                            </div>
+                        )}
                     </button>
                 </div>
                 <div className="px-6">
                     <div className="h-[36px] flex items-center justify-between gap-4 px-4 mb-6 border-b-[1px] border-[#ffffff1a] text-[#a7a7a7]">
                         <span className="text-sm  ml-[4px]">#</span>
                         <span className="flex-1 text-sm font-light">Title</span>
-                        <span className="hidden md:inline-block flex-1 text-sm font-light">
-                            Album
-                        </span>
-                        <span className="hidden xl:inline-block flex-1 text-sm font-light">
-                            Date added
-                        </span>
+                        <span className="hidden md:inline-block flex-1 text-sm font-light">Album</span>
+                        <span className="hidden xl:inline-block flex-1 text-sm font-light">Date added</span>
                         <span className="w-[120px] flex flex-shrink-0 items-center justify-end">
                             <ClockIcon width={16} height={16} />
                         </span>

@@ -1,6 +1,6 @@
 import { LEFTSIDE_FOOTER_ITEMS } from '~/const.data';
 import { LanguageIcon } from '../Icons';
-import useSongReducer from '~/hooks/useSongReducer';
+import { useSongReducer } from '~/hooks';
 
 const LeftsideFooter = () => {
     const { songState } = useSongReducer();

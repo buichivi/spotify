@@ -21,6 +21,7 @@ export const initSongState = {
             },
         },
     },
+    isSaved: false
 };
 
 export const songReducer = (state, action) => {
@@ -49,6 +50,11 @@ export const songReducer = (state, action) => {
                 ...state,
                 user: { ...action.payLoad },
             };
+        case 'SET_IS_SAVED_TRACK':
+            return {
+                ...state,
+                isSaved: action.payLoad
+            }
         default:
             return state;
     }

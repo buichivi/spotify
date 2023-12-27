@@ -1,13 +1,10 @@
 import { createContext, useEffect, useReducer } from 'react';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi } from '~/hooks';
 import { initLibraryState, libraryReducer } from '~/reducer/libraryReducer';
 
 export const LibraryContext = createContext();
 const LibraryProvider = ({ children }) => {
-    const [libraryState, dispatchLibraryState] = useReducer(
-        libraryReducer,
-        initLibraryState,
-    );
+    const [libraryState, dispatchLibraryState] = useReducer(libraryReducer, initLibraryState);
     const spotifyApi = useSpotifyApi();
 
     useEffect(() => {
@@ -25,7 +22,7 @@ const LibraryProvider = ({ children }) => {
                     name: playlist?.name,
                     type: playlist?.type,
                     uri: playlist?.uri,
-                    owner: playlist?.owner?.display_name
+                    owner: playlist?.owner?.display_name,
                 })),
                 artists: artists.body.artists.items.map((artist) => ({
                     imageUrl: artist?.images[0].url,
@@ -40,9 +37,9 @@ const LibraryProvider = ({ children }) => {
                     name: item?.album.name,
                     type: item?.album.type,
                     uri: item?.album.uri,
-                    owner: item?.album.artists[0].name
+                    owner: item?.album.artists[0].name,
                 })),
-                savedTracks: savedTracks?.body.total
+                savedTracks: savedTracks?.body.total,
             };
             dispatchLibraryState({
                 type: 'UPDATE_LIBRARY',
@@ -54,11 +51,7 @@ const LibraryProvider = ({ children }) => {
         }
     }, [spotifyApi]);
 
-    return (
-        <LibraryContext.Provider value={{ libraryState, dispatchLibraryState }}>
-            {children}
-        </LibraryContext.Provider>
-    );
+    return <LibraryContext.Provider value={{ libraryState, dispatchLibraryState }}>{children}</LibraryContext.Provider>;
 };
 
 export default LibraryProvider;

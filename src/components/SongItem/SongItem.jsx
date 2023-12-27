@@ -1,9 +1,7 @@
 import { HeartIcon, PauseIcon, PlayIcon } from '../Icons';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi, useSongReducer, useLibraryReducer } from '~/hooks';
 import { durationConvert, convertDateString } from '~/utils';
-import useSongReducer from '~/hooks/useSongReducer';
 import { Link } from 'react-router-dom';
-import useLibraryReducer from '~/hooks/useLibraryReducer';
 import { useEffect, useState } from 'react';
 
 const SongItem = ({
@@ -31,27 +29,21 @@ const SongItem = ({
     useEffect(() => {
         setIsSavedTrack(isSaved);
     }, [isSaved]);
-    
+
     var isActive = false;
     if (isArtist) {
         isActive =
-            songState?.context?.context_uri == artistUri &&
-            songState?.context?.option?.uris[0] == trackData?.uri;
+            songState?.context?.context_uri == artistUri && songState?.context?.option?.uris[0] == trackData?.uri;
     } else if (isAlbum) {
         isActive =
-            songState?.context?.context_uri == albumUri &&
-            songState?.context?.option?.offset?.uri == trackData?.uri;
+            songState?.context?.context_uri == albumUri && songState?.context?.option?.offset?.uri == trackData?.uri;
     } else if (isPlaylist) {
         isActive =
-            songState?.context?.context_uri == playlistUri &&
-            songState?.context?.option?.offset?.uri == trackData?.uri;
+            songState?.context?.context_uri == playlistUri && songState?.context?.option?.offset?.uri == trackData?.uri;
     }
 
     const idx = context.indexOf(trackData.uri);
-    const new_queue = Array.isArray(context) && [
-        ...context.slice(idx),
-        ...context.slice(0, idx),
-    ];
+    const new_queue = Array.isArray(context) && [...context.slice(idx), ...context.slice(0, idx)];
 
     const handlePlayAndResume = async () => {
         var optionPlay = {};
@@ -84,8 +76,7 @@ const SongItem = ({
             .play({
                 device_id: songState.deviceId,
                 ...optionPlay,
-                position_ms:
-                    trackData.id == songState.songId ? songState.position : 0,
+                position_ms: trackData.id == songState.songId ? songState.position : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -127,8 +118,7 @@ const SongItem = ({
                 <span
                     className="group-hover:hidden block relative top-[2px] text-[#a7a7a7] font-light"
                     style={{
-                        display:
-                            isActive && songState.isPlaying == true && 'none',
+                        display: isActive && songState.isPlaying == true && 'none',
                     }}
                 >
                     <span
@@ -151,10 +141,7 @@ const SongItem = ({
                     <div
                         onClick={handlePlayAndResume}
                         style={{
-                            display:
-                                isActive &&
-                                songState.isPlaying == true &&
-                                'none',
+                            display: isActive && songState.isPlaying == true && 'none',
                         }}
                     >
                         <PlayIcon width={16} height={16} />
@@ -169,16 +156,12 @@ const SongItem = ({
             <div className="flex-1 flex-shrink-0 flex">
                 {!isHideImg && (
                     <div className="w-10 h-10 flex-shrink-0 rounded-md overflow-hidden mr-3">
-                        <img
-                            className="w-full h-full object-cover"
-                            src={trackData?.album?.images[0].url}
-                            alt=""
-                        />
+                        <img className="w-full h-full object-cover" src={trackData?.album?.images[0].url} alt="" />
                     </div>
                 )}
                 <div className="flex flex-col justify-start">
                     <span
-                        className="text-base text-white text-climp-1"
+                        className="text-base text-white text-climp-1 font-light"
                         style={{
                             color: isActive ? '#1db954' : 'currentcolor',
                         }}
@@ -188,9 +171,7 @@ const SongItem = ({
                     <div className="flex flex-shrink-0">
                         {trackData.explicit && (
                             <div className="w-4 h-4 mr-2 bg-[#ffffff99] text-[#121212] flex items-center justify-center rounded-sm">
-                                <span className="text-[8px] relative top-[1px]">
-                                    E
-                                </span>
+                                <span className="text-[8px] relative top-[1px]">E</span>
                             </div>
                         )}
                         {!isHideArtists && (
@@ -202,12 +183,8 @@ const SongItem = ({
                                             className="text-sm font-light text-[#a7a7a7]"
                                             to={`/artist/${artist?.id}`}
                                         >
-                                            <span className="hover:underline">
-                                                {artist.name}
-                                            </span>
-                                            {index <=
-                                                trackData?.artists.length - 2 &&
-                                                ', '}
+                                            <span className="hover:underline">{artist.name}</span>
+                                            {index <= trackData?.artists.length - 2 && ', '}
                                         </Link>
                                     );
                                 })}
@@ -246,9 +223,7 @@ const SongItem = ({
                         width={16}
                         height={16}
                         isLiked={isSavedTrack}
-                        className={`${
-                            isSavedTrack ? 'inline-block' : 'hidden'
-                        } group-hover:inline-block`}
+                        className={`${isSavedTrack ? 'inline-block' : 'hidden'} group-hover:inline-block`}
                     />
                 </div>
                 <span className="w-[60px] text-right text-[#a7a7a7] text-sm font-light">

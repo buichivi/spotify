@@ -16,7 +16,7 @@ const LibraryItem = ({
         if (isActive) {
             librayItem.current.scrollIntoView({
                 behavior: 'smooth',
-                inline: 'start',
+                block: 'nearest',
             });
         }
     }, [isActive]);

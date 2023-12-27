@@ -1,13 +1,10 @@
 import { createContext, useEffect, useReducer } from 'react';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi } from '~/hooks';
 import { initSongState, songReducer } from '~/reducer/songReducer';
 
 const SongContext = createContext();
 const SongProvider = ({ children }) => {
-    const [songState, dispatchSongState] = useReducer(
-        songReducer,
-        initSongState,
-    );
+    const [songState, dispatchSongState] = useReducer(songReducer, initSongState);
 
     const spotifyApi = useSpotifyApi();
 
@@ -24,16 +21,32 @@ const SongProvider = ({ children }) => {
                 },
             });
         };
+        const isSavedTrack = async () => {
+            const isSaved = await spotifyApi.containsMySavedTracks([songState.songId]);
+            console.log(isSaved);
+            dispatchSongState({
+                type: 'SET_IS_SAVED_TRACK',
+                payLoad: isSaved.body[0],
+            });
+        };
+
         if (!spotifyApi.error) {
             loadUser();
         }
     }, [spotifyApi]);
 
-    return (
-        <SongContext.Provider value={{ songState, dispatchSongState }}>
-            {children}
-        </SongContext.Provider>
-    );
+    useEffect(() => {
+        const isSavedTrack = async () => {
+            const isSaved = await spotifyApi.containsMySavedTracks([songState.songId]);
+            dispatchSongState({
+                type: 'SET_IS_SAVED_TRACK',
+                payLoad: isSaved.body[0],
+            });
+        };
+        if (songState.songId) isSavedTrack();
+    }, [songState.songId]);
+
+    return <SongContext.Provider value={{ songState, dispatchSongState }}>{children}</SongContext.Provider>;
 };
 
 export default SongProvider;

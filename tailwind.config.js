@@ -33,6 +33,11 @@ export default {
                     '100%': { bottom: '-100%' },
                 },
             },
+            screens: {
+                '3xl': '1700px',
+                '4xl': '2000px',
+
+            }
         },
     },
     plugins: [],

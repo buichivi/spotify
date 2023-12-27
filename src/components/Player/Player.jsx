@@ -1,21 +1,42 @@
 import { Link } from 'react-router-dom';
-import {
-    NextIcon,
-    PauseIcon,
-    PlayIcon,
-    PrevIcon,
-    ReplayIcon,
-    ShuffleIcon,
-} from '../Icons';
+import { HeartIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon } from '../Icons';
 import VolumeControl from '../VolumeControl';
 import PlaybackTracker from '../PlaybackTracker';
 import { spotifyApi } from '~/config/spotify';
-import useSongReducer from '~/hooks/useSongReducer';
+import { useSongReducer, useLibraryReducer } from '~/hooks';
 
 function Player({ data }) {
     const { player, is_active, is_paused, current_track, state } = data;
-    const { songState } = useSongReducer();
+    const { songState, dispatchSongState } = useSongReducer();
+    const { dispatchLibraryState } = useLibraryReducer();
     console.log('Player re-render');
+
+    const handleSaveTrack = () => {
+        if (!songState.isSaved) {
+            spotifyApi.addToMySavedAlbums([songState.songId]).then(() => {
+                dispatchSongState({
+                    type: 'SET_IS_SAVED_TRACK',
+                    payLoad: true,
+                });
+                dispatchLibraryState({
+                    type: 'ADD_A_SAVE_TRACK',
+                    payLoad: 1,
+                });
+            });
+        } else {
+            spotifyApi.removeFromMySavedAlbums([songState.songId]).then(() => {
+                dispatchSongState({
+                    type: 'SET_IS_SAVED_TRACK',
+                    payLoad: false,
+                });
+                dispatchLibraryState({
+                    type: 'REMOVE_A_SAVED_TRACK',
+                    payLoad: 1,
+                });
+            });
+        }
+    };
+
     return (
         <>
             {!is_active && <h3>Loading...</h3>}
@@ -31,9 +52,7 @@ function Player({ data }) {
                         </div>
                         <div className="flex flex-col pl-3">
                             <Link
-                                to={`/album/${
-                                    current_track?.album?.uri?.split(':')[2]
-                                }`}
+                                to={`/album/${current_track?.album?.uri?.split(':')[2]}`}
                                 className="text-climp-1 text-sm text-white hover:underline"
                             >
                                 {current_track?.name}
@@ -43,21 +62,24 @@ function Player({ data }) {
                                     return (
                                         <Link
                                             key={index}
-                                            to={`/artist/${
-                                                artist?.uri?.split(':')[2]
-                                            }`}
+                                            to={`/artist/${artist?.uri?.split(':')[2]}`}
                                             className="text-[11px] text-[#b3b3b3]"
                                         >
-                                            <span className="hover:underline">
-                                                {artist?.name}
-                                            </span>
-                                            {index <=
-                                                current_track.artists.length -
-                                                    2 && <span>, </span>}
+                                            <span className="hover:underline">{artist?.name}</span>
+                                            {index <= current_track.artists.length - 2 && <span>, </span>}
                                         </Link>
                                     );
                                 })}
                             </div>
+                        </div>
+                        <div
+                            className="px-4 cursor-pointer hover:text-white"
+                            style={{
+                                color: songState.isSaved ? '#1db954' : '#b3b3b3',
+                            }}
+                            onClick={handleSaveTrack}
+                        >
+                            <HeartIcon width={16} height={16} isLiked={songState.isSaved} />
                         </div>
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center">
@@ -65,9 +87,7 @@ function Player({ data }) {
                             <button
                                 className="w-8 h-8 flex-shrink-0 flex items-center cursor-default justify-center text-[#ffffffb3] hover:text-white"
                                 onClick={() => {
-                                    spotifyApi
-                                        .setShuffle(String(!state.shuffle))
-                                        .then((res) => console.log(res));
+                                    spotifyApi.setShuffle(String(!state.shuffle)).then((res) => console.log(res));
                                 }}
                             >
                                 {state.shuffle ? (
@@ -91,19 +111,13 @@ function Player({ data }) {
                                 onClick={() => {
                                     player.togglePlay();
                                     if (is_paused) {
-                                        player
-                                            .seek(songState.position)
-                                            .then(() => {
-                                                console.log('Updated position');
-                                            });
+                                        player.seek(songState.position).then(() => {
+                                            console.log('Updated position');
+                                        });
                                     }
                                 }}
                             >
-                                {is_paused ? (
-                                    <PlayIcon width={18} height={18} />
-                                ) : (
-                                    <PauseIcon width={18} height={18} />
-                                )}
+                                {is_paused ? <PlayIcon width={18} height={18} /> : <PauseIcon width={18} height={18} />}
                             </button>
                             <button
                                 className="w-8 h-8 flex-shrink-0 flex items-center cursor-default justify-center text-[#ffffffb3] hover:text-white"
@@ -114,18 +128,9 @@ function Player({ data }) {
                             <button
                                 className="w-8 h-8 flex-shrink-0 flex items-center cursor-default justify-center text-[#ffffffb3] hover:text-white"
                                 onClick={() => {
-                                    const repeatMode = [
-                                        'off',
-                                        'context',
-                                        'track',
-                                    ];
-                                    const mode =
-                                        state.repeat_mode + 1 > 2
-                                            ? 0
-                                            : state.repeat_mode + 1;
-                                    spotifyApi
-                                        .setRepeat(repeatMode[mode])
-                                        .then((res) => console.log(res));
+                                    const repeatMode = ['off', 'context', 'track'];
+                                    const mode = state.repeat_mode + 1 > 2 ? 0 : state.repeat_mode + 1;
+                                    spotifyApi.setRepeat(repeatMode[mode]).then((res) => console.log(res));
                                 }}
                             >
                                 {state.repeat_mode === 0 && <ReplayIcon />}

@@ -1,17 +1,9 @@
 import { forwardRef, memo, useEffect, useState } from 'react';
-import {
-    ArrowDownIcon,
-    BellIcon,
-    ChevronLeft,
-    ChevronRight,
-    PauseIcon,
-    PlayIcon,
-} from '~/components/Icons';
+import { ArrowDownIcon, BellIcon, ChevronLeft, ChevronRight, PauseIcon, PlayIcon } from '~/components/Icons';
 import { Link, useLocation } from 'react-router-dom';
 import SearchInput from '~/components/SearchInput';
 import { AUTH_URL } from '~/config/spotify';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
-import useSongReducer from '~/hooks/useSongReducer';
+import { useSpotifyApi, useSongReducer } from '~/hooks';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
@@ -29,83 +21,76 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
             optionPlay =
                 songState?.context?.context_uri == currentContent?.uri
                     ? {
-                        uris: songState?.context?.option?.uris,
-                    }
+                          uris: songState?.context?.option?.uris,
+                      }
                     : {
-                        context_uri: currentContent?.uri,
-                    };
+                          context_uri: currentContent?.uri,
+                      };
             payLoad =
                 songState?.context?.context_uri == currentContent?.uri
                     ? {
-                        context: {
-                            context_uri: songState?.context?.context_uri,
-                            option: {
-                                uris: songState?.context?.option?.uris,
-                            },
-                        },
-                    }
+                          context: {
+                              context_uri: songState?.context?.context_uri,
+                              option: {
+                                  uris: songState?.context?.option?.uris,
+                              },
+                          },
+                      }
                     : {
-                        context: {
-                            context_uri: currentContent?.uri,
-                            option: {
-                                uris: [topTracks[0]?.uri],
-                            },
-                        },
-                    };
-        } else if (
-            currentContent?.type == 'album' ||
-            currentContent?.type == 'playlist'
-        ) {
+                          context: {
+                              context_uri: currentContent?.uri,
+                              option: {
+                                  uris: [topTracks[0]?.uri],
+                              },
+                          },
+                      };
+        } else if (currentContent?.type == 'album' || currentContent?.type == 'playlist') {
             console.log(currentContent?.tracks?.items[0]?.track);
             optionPlay =
                 songState?.context?.context_uri == currentContent?.uri
                     ? {
-                        context_uri: songState?.context?.context_uri,
-                        offset: songState?.context?.option?.offset,
-                    }
+                          context_uri: songState?.context?.context_uri,
+                          offset: songState?.context?.option?.offset,
+                      }
                     : {
-                        context_uri: currentContent?.uri,
-                        offset: {
-                            uri:
-                                currentContent?.type == 'album'
-                                    ? currentContent?.tracks?.items[0]?.uri
-                                    : currentContent?.tracks?.items[0]?.track
-                                        ?.uri,
-                        },
-                    };
+                          context_uri: currentContent?.uri,
+                          offset: {
+                              uri:
+                                  currentContent?.type == 'album'
+                                      ? currentContent?.tracks?.items[0]?.uri
+                                      : currentContent?.tracks?.items[0]?.track?.uri,
+                          },
+                      };
             payLoad =
                 songState?.context?.context_uri == currentContent?.uri
                     ? {
-                        context: {
-                            context_uri: songState?.context?.context_uri,
-                            option: {
-                                offset: songState?.context?.option?.offset,
-                            },
-                        },
-                    }
+                          context: {
+                              context_uri: songState?.context?.context_uri,
+                              option: {
+                                  offset: songState?.context?.option?.offset,
+                              },
+                          },
+                      }
                     : {
-                        context: {
-                            context_uri: currentContent?.uri,
-                            option: {
-                                offset: {
-                                    uri: currentContent?.type == 'album'
-                                    ? currentContent?.tracks?.items[0]?.uri
-                                    : currentContent?.tracks?.items[0]?.track
-                                        ?.uri,
-                                },
-                            },
-                        },
-                    };
+                          context: {
+                              context_uri: currentContent?.uri,
+                              option: {
+                                  offset: {
+                                      uri:
+                                          currentContent?.type == 'album'
+                                              ? currentContent?.tracks?.items[0]?.uri
+                                              : currentContent?.tracks?.items[0]?.track?.uri,
+                                  },
+                              },
+                          },
+                      };
         }
 
         spotifyApi
             .play({
                 device_id: songState.deviceId,
                 ...optionPlay,
-                position_ms:
-                    songState?.context?.context_uri == currentContent?.uri
-                        ? songState.position
-                        : 0,
+                position_ms: songState?.context?.context_uri == currentContent?.uri ? songState.position : 0,
             })
             .then(() => {
                 dispatchSongState({
@@ -121,10 +106,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
 
     useEffect(() => {
         const loadArtistTopTracks = async () => {
-            const toptracks = await spotifyApi.getArtistTopTracks(
-                currentContent.id,
-                'VN',
-            );
+            const toptracks = await spotifyApi.getArtistTopTracks(currentContent.id, 'VN');
             setTopTracks(toptracks.body.tracks);
         };
         if (!spotifyApi.error && currentContent.id) {
@@ -168,8 +150,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                             className="p-[100%]"
                             style={{
                                 display:
-                                    songState?.context?.context_uri ==
-                                        currentContent?.uri &&
+                                    songState?.context?.context_uri == currentContent?.uri &&
                                     songState.isPlaying == true &&
                                     'none',
                             }}
@@ -177,23 +158,19 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                         >
                             <PlayIcon />
                         </div>
-                        {songState?.context?.context_uri ==
-                            currentContent?.uri &&
-                            songState.isPlaying == true && (
-                                <div className="p-[100%]" onClick={handlePause}>
-                                    <PauseIcon />
-                                </div>
-                            )}
+                        {songState?.context?.context_uri == currentContent?.uri && songState.isPlaying == true && (
+                            <div className="p-[100%]" onClick={handlePause}>
+                                <PauseIcon />
+                            </div>
+                        )}
                     </button>
-                    <span className="text-climp-1 text-2xl font-bold">
-                        {currentContent?.name}
-                    </span>
+                    <span className="text-climp-1 text-2xl font-bold">{currentContent?.name}</span>
                 </div>
             )}
             {location.pathname.includes('/search') && <SearchInput />}
             {songState.user.name === '' ? (
                 <div className="flex items-center justify-between gap-[25px]">
-                    <ul className="flex items-center px-2 py-2 gap-2">
+                    <ul className="hidden xl:flex items-center px-2 py-2 gap-2">
                         <li>
                             <a
                                 className="inline-block py-2 font-bold text-[#a7a7a7] tracking-widest cursor-pointer hover:text-white hover:scale-105 transition"
@@ -219,7 +196,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                             </a>
                         </li>
                     </ul>
-                    <span className="w-[1px] h-[25px] bg-white blur-[1px]"></span>
+                    <span className="hidden xl:inline-block w-[1px] h-[25px] bg-white blur-[1px]"></span>
                     <div className="flex gap-8 ml-4">
                         <a
                             href={AUTH_URL}
@@ -249,7 +226,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                         href="https://open.spotify.com/download"
                         target="_blank"
                         rel="noreferrer"
-                        className="py-1 pr-4 pl-[33px] h-8 bg-[#0000008a] cursor-pointer rounded-full relative hidden md:flex items-center justify-center"
+                        className="py-1 pr-4 pl-[33px] h-8 bg-[#0000008a] cursor-pointer rounded-full relative hidden xl:flex items-center justify-center"
                     >
                         <ArrowDownIcon className="absolute top-1/2 left-2 -translate-y-1/2" />
                         <span className="text-climp-1 text-white text-sm font-bold relative top-[1px]">
@@ -258,7 +235,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                     </a>
                     <Link
                         to=""
-                        className="hidden md:flex flex-shrink-0 group w-8 h-8 bg-[#0000008a] rounded-full items-center justify-center hover:scale-105 transition"
+                        className="hidden xl:flex flex-shrink-0 group w-8 h-8 bg-[#0000008a] rounded-full items-center justify-center hover:scale-105 transition"
                     >
                         <BellIcon className="group-hover:font-bold text-white" />
                     </Link>
@@ -268,7 +245,9 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                             window.localStorage.removeItem('refresh_token');
                             window.location = origin;
                         }}
-                        className="flex items-center gap-2 justify-center cursor-pointer py-1 px-3 h-9 rounded-full transition"
+                        className="flex flex-shrink-0 items-center gap-2 justify-center cursor-pointer w-9 md:w-auto md:py-1 md:px-3 h-9 rounded-full transition
+                         bg-[#0000008a] md:bg-transparent
+                        "
                     >
                         <img
                             src={songState.user.imageUrl}
@@ -277,7 +256,7 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                             alt={songState.user.name}
                             className="rounded-full"
                         />
-                        <span>{songState.user.name}</span>
+                        <span className="hidden md:inline-block">{songState.user.name}</span>
                     </button>
                 </div>
             )}

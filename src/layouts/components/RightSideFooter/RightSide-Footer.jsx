@@ -1,6 +1,6 @@
 import LeftsideFooter from '~/components/LeftsideFooter';
 import { RIGHTSIDE_FOOTER_ITEMS, SOCIAL_MEDIA_ITEMS } from '~/const.data';
-import useSongReducer from '~/hooks/useSongReducer';
+import { useSongReducer } from '~/hooks';
 
 const RightSideFooter = () => {
     const { songState } = useSongReducer();
@@ -11,13 +11,8 @@ const RightSideFooter = () => {
                 <div className="flex items-start justify-between md:justify-start flex-auto flex-wrap mb-4">
                     {RIGHTSIDE_FOOTER_ITEMS.map((item, index) => {
                         return (
-                            <div
-                                key={index}
-                                className="basis-1/4 flex-grow-0 h-[180px] flex flex-col pr-6 pb-8"
-                            >
-                                <h4 className="font-bold text-white mb-2">
-                                    {item.title}
-                                </h4>
+                            <div key={index} className="basis-1/4 flex-grow-0 h-[180px] flex flex-col pr-6 pb-8">
+                                <h4 className="font-bold text-white mb-2">{item.title}</h4>
                                 {item.list.map((listItem, index) => (
                                     <a
                                         key={index}
@@ -54,9 +49,7 @@ const RightSideFooter = () => {
             </div>
             <div className="pt-4 flex items-center justify-between flex-wrap">
                 {songState.user.name && <LeftsideFooter />}
-                <p className="text-sm text-[#a7a7a7] tracking-wide font-light">
-                    © 2023 Spotify AB
-                </p>
+                <p className="text-sm text-[#a7a7a7] tracking-wide font-light">© 2023 Spotify AB</p>
             </div>
         </div>
     );

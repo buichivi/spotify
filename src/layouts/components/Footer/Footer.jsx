@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import Player from '~/components/Player';
 import { AUTH_URL } from '~/config/spotify';
-import useSongReducer from '~/hooks/useSongReducer';
-import useSpotifyApi from '~/hooks/useSpotifyApi';
+import { useSpotifyApi, useSongReducer } from '~/hooks';
 
 const track = {
     name: '',
@@ -65,14 +64,10 @@ const Footer = () => {
                         type: 'UPDATE_SONG_STATE',
                         payLoad: {
                             songId: state?.track_window?.current_track?.id,
-                            albumId:
-                                state?.track_window?.current_track?.album?.uri.split(
-                                    ':',
-                                )[2],
-                            artistIds:
-                                state?.track_window?.current_track?.artists?.map(
-                                    (artist) => artist?.uri.split(':')[2],
-                                ),
+                            albumId: state?.track_window?.current_track?.album?.uri.split(':')[2],
+                            artistIds: state?.track_window?.current_track?.artists?.map(
+                                (artist) => artist?.uri.split(':')[2],
+                            ),
                             uri: state?.track_window?.current_track?.uri,
                             isPlaying: !state?.paused,
                             duration: state?.duration,
@@ -84,8 +79,7 @@ const Footer = () => {
                     setPaused(state.paused);
 
                     if (state?.paused) {
-                        document.title =
-                            'Spotify - Web player: Music for everyone';
+                        document.title = 'Spotify - Web player: Music for everyone';
                     } else
                         document.title =
                             state?.track_window?.current_track?.name +
@@ -126,12 +120,9 @@ const Footer = () => {
                     className="w-full h-full pt-[11px] pr-[24px] pb-[7px] pl-[15px] bg-gradient-to-r from-[#af2896] to-[#509bf5] flex items-center justify-between"
                 >
                     <div>
-                        <h5 className="uppercase text-sm font-thin">
-                            Preview of spotify
-                        </h5>
+                        <h5 className="uppercase text-sm font-thin">Preview of spotify</h5>
                         <p className="font-normal">
-                            Sign up to get unlimited songs and podcasts with
-                            occasional ads. No credit card needed.
+                            Sign up to get unlimited songs and podcasts with occasional ads. No credit card needed.
                         </p>
                     </div>
                     <button className="h-12 py-2 px-8 bg-white text-black rounded-full font-bold hover:scale-105">

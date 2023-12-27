@@ -33,13 +33,10 @@
     }
 
     /* scroll bar */
-    /* body::-webkit-scrollbar {
+    body::-webkit-scrollbar {
         display: none;
-    } */
+    }
     
-    /* ::-webkit-scrollbar-thumb {
-        background-color: hsla(0, 0%, 100%, 0.3);
-    } */
 
     a {
         text-decoration: none;
@@ -53,7 +50,11 @@
     --os-handle-bg: hsla(0, 0%, 100%, 0.3);
     --os-handle-bg-hover: hsla(0, 0%, 100%, 0.5);
     --os-handle-bg-active: hsla(0, 0%, 100%, 0.7);
-    transform: translate(0, 4px);
+    /* transform: translate(0, 4px); */
+    --os-padding-axis: 4px 0px;
+    padding: 5px 0;    
+    margin-right: 2px;
+    z-index: 99;
 }
 
 .top-track-limit-5:nth-child(n + 6) {
@@ -80,16 +81,6 @@
 
 .search-input:not(:placeholder-shown) + .clear-btn {
     display: inline-block;
-}
-
-.category-item:nth-child(n + 6) {
-    display: none;
-}
-
-@media screen and (min-width: 1500px) {
-    .category-item:nth-child(n + 6) {
-        display: inline-block;
-    }
 }
 
 /* Playback tracker and volume bar*/

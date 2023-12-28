@@ -9,10 +9,19 @@ import { useSpotifyApi, useSongReducer } from '~/hooks';
 const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     const location = useLocation();
     const [topTracks, setTopTracks] = useState([]);
-    const [typeIds, setTypeIds] = useState([]);
+    const [history, setHistory] = useState([])
+    const [indexPage, setIndexPage] = useState(0);
     const { songState, dispatchSongState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
     console.log('Navbar render');
+
+    console.log(history);
+    console.log(indexPage);
+
+    useEffect(() => {
+        setHistory([...history, location.pathname])
+        setIndexPage(history.length)
+    }, [location.pathname]) 
 
     const handlePlayAndResume = async () => {
         var optionPlay = {};
@@ -116,19 +125,17 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
         }
     }, [spotifyApi, currentContent.id]);
 
-    useEffect(() => {
-        if (currentContent.type == 'artist') {
-            setTypeIds(songState.artistIds);
-        }
-    }, [location.pathname, songState.artistIds]);
-
     return (
         <nav
             ref={ref}
             className="w-full h-nav bg-transparent transition-all duration-500 py-4 px-6 flex items-center justify-between gap-3 absolute top-0 left-0 z-10"
         >
             <div className="flex gap-2">
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3] text-white opacity-[0.6] cursor-not-allowed">
+                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3] text-white opacity-[0.6] cursor-not-allowed"
+                    onClick={() => {
+                        console.log(window.history)
+                    }}
+                >
                     <ChevronLeft width={16} height={16} />
                 </div>
                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3] text-white opacity-[0.6] cursor-not-allowed">

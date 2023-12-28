@@ -18,18 +18,10 @@ const SongProvider = ({ children }) => {
                 payLoad: {
                     name: user?.body?.display_name,
                     imageUrl: user?.body?.images[0]?.url,
+                    product: user?.body?.product
                 },
             });
         };
-        const isSavedTrack = async () => {
-            const isSaved = await spotifyApi.containsMySavedTracks([songState.songId]);
-            console.log(isSaved);
-            dispatchSongState({
-                type: 'SET_IS_SAVED_TRACK',
-                payLoad: isSaved.body[0],
-            });
-        };
-
         if (!spotifyApi.error) {
             loadUser();
         }

@@ -103,15 +103,21 @@ const Footer = () => {
     return (
         <>
             {songState.user.name !== '' ? (
-                <Player
-                    data={{
-                        is_active,
-                        player,
-                        is_paused,
-                        current_track,
-                        state,
-                    }}
-                />
+                <>
+                    {songState.user.product == 'premium' ? (
+                        <Player
+                            data={{
+                                is_active,
+                                player,
+                                is_paused,
+                                current_track,
+                                state,
+                            }}
+                        />
+                    ) : (
+                        <h3>You need premium account to play music.</h3>
+                    )}
+                </>
             ) : (
                 <a
                     href={AUTH_URL}

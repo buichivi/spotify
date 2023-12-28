@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { HomeIcon, HomeIconActived, SearchIcon, SearchIconActived, SpotifyLogo } from '~/components/Icons';
 import { useSongReducer } from '~/hooks';
-const Menu = () => {
+const Menu = ({ isMinimize = false }) => {
     const location = useLocation();
     const { songState } = useSongReducer();
 
@@ -22,7 +22,9 @@ const Menu = () => {
                         }`}
                     >
                         {location.pathname === '/' ? <HomeIconActived /> : <HomeIcon />}
-                        <span className="pl-5 text-[15px] leading-10 align-middle relative top-[3px]">Home</span>
+                        {!isMinimize && (
+                            <span className="pl-5 text-[15px] leading-10 align-middle relative top-[3px]">Home</span>
+                        )}
                     </Link>
                 </li>
                 <li className="h-[48px] px-3 py-1">
@@ -33,7 +35,9 @@ const Menu = () => {
                         }`}
                     >
                         {location.pathname.includes('/search') ? <SearchIconActived /> : <SearchIcon />}
-                        <span className="pl-5 text-[15px] leading-10 align-middle relative top-[3px]">Search</span>
+                        {!isMinimize && (
+                            <span className="pl-5 text-[15px] leading-10 align-middle relative top-[3px]">Search</span>
+                        )}
                     </Link>
                 </li>
             </ul>

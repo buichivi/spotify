@@ -8,20 +8,23 @@ const SearchInput = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        inputRef.current.focus()
-    }, [])
+        inputRef.current.focus();
+    }, []);
 
     useEffect(() => {
         const timerId = setTimeout(() => {
-            navigate(`/search/${searchValue}`)
+            if (searchValue) navigate(`/search/${searchValue}`);
         }, 1000);
-        return () => clearTimeout(timerId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => clearTimeout(timerId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchValue]);
 
     return (
         <div className="flex flex-1 items-center justify-start">
-            <form className="group flex flex-364 items-center bg-[#242424] relative rounded-full">
+            <form
+                className="group flex flex-364 items-center bg-[#242424] relative rounded-full"
+                onSubmit={(e) => e.preventDefault()}
+            >
                 <SearchIcon
                     width={18}
                     height={18}

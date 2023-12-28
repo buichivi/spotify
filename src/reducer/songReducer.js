@@ -2,6 +2,7 @@ export const initSongState = {
     user: {
         name: '',
         imageUrl: '',
+        product: ''
     },
     songId: '',
     albumId: '',

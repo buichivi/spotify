@@ -13,13 +13,13 @@ const Category = ({ data = [], title, type = 'playlist', to, className }) => {
                 </Link>
             </div>
             <div
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 4xl:grid-cols-10 gap-category-gap category
-                [&>*:nth-child(n+3)]:hidden md:[&>*:nth-child(n+3)]:inline-block 
-                [&>*:nth-child(n+4)]:hidden lg:[&>*:nth-child(n+4)]:inline-block 
-                [&>*:nth-child(n+5)]:hidden xl:[&>*:nth-child(n+5)]:inline-block
-                [&>*:nth-child(n+6)]:hidden 2xl:[&>*:nth-child(n+6)]:inline-block
-                [&>*:nth-child(n+8)]:hidden 3xl:[&>*:nth-child(n+8)]:inline-block
-                [&>*:nth-child(n+11)]:hidden 4xl:[&>*:nth-child(n+11)]:inline-block
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 3xl:grid-cols-8 4xl:grid-cols-10 gap-category-gap category
+                [&>*:nth-child(n+3)]:hidden md:[&>*:nth-child(n+3)]:inline-block
+                md:[&>*:nth-child(n+4)]:hidden lg:[&>*:nth-child(n+4)]:inline-block 
+                lg:[&>*:nth-child(n+5)]:hidden xl:[&>*:nth-child(n+6)]:inline-block
+                xl:[&>*:nth-child(n+7)]:hidden 2xl:[&>*:nth-child(n+7)]:inline-block
+                2xl:[&>*:nth-child(n+9)]:hidden 
+                3xl:[&>*:nth-child(n+9)]:inline-block 
             "
             >
                 {data.map((item, index) => {

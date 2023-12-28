@@ -54,10 +54,6 @@ const RightSide = ({ children }) => {
         }
     }, [location, spotifyApi]);
 
-    useEffect(() => {
-        console.dir(mainContentDiv.current.getElement().scrollTop);
-    }, [location.pathname]);
-
     const handleScroll = (e) => {
         let scrollTop = 0;
         if (isMainContent) {

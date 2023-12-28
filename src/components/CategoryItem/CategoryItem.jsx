@@ -26,8 +26,7 @@ const CategoryItem = ({
             />
             <Link
                 to={to}
-                className="text-climp-1 text-normal font-bold pb-1 overflow-hidden no-underline"
-                
+                className="text-climp-1 text-normal font-bold pb-1 overflow-hidden no-underline lg:leading-7"
                 onClick={e => e.stopPropagation()}
             >
                 {name}

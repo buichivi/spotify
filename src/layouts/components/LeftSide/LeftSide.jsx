@@ -12,6 +12,7 @@ const LeftSide = () => {
     const { libraryState } = useLibraryReducer();
     const [libraryFilter, setLibraryFilter] = useState('');
     const [searchLibrary, setSearchLibrary] = useState('');
+    const [isMinimize, setIsMinimize] = useState(false);
     const { albums, artists, playlists, savedTracks } = libraryState;
     const search = useDebounced(searchLibrary.toLowerCase().trim(), 500);
     var library = [...playlists, ...albums, ...artists];
@@ -34,22 +35,25 @@ const LeftSide = () => {
     };
 
     return (
-        <>
+        <div className={`${isMinimize ? 'w-[72px]' : 'w-[280px]'} shrink-0 flex flex-col gap-2`}>
             <div className="w-full h-auto bg-[#121212] rounded-md">
-                <Menu />
+                <Menu isMinimize={isMinimize} />
             </div>
             <div className="w-full flex-auto flex flex-col justify-between bg-[#121212] rounded-md">
                 <header className="px-4 h-auto text-[#a7a7a7]">
                     <div className="py-3 flex items-center justify-between">
-                        <div className="flex items-center px-2 py-1 hover:text-white transition cursor-pointer">
-                            <LibraryIcon />
-                            <span className="relative top-[2px] pl-3">Your Library</span>
+                        <div
+                            className="flex items-center px-2 py-1 hover:text-white transition cursor-pointer"
+                            onClick={() => setIsMinimize(prev => !prev)}
+                        >
+                            <LibraryIcon isActive={isMinimize}/>
+                            {!isMinimize && <span className="relative top-[2px] pl-3">Your Library</span>}
                         </div>
-                        <div className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1a1a1a] cursor-pointer transition-all">
+                        {!isMinimize && <div className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1a1a1a] cursor-pointer transition-all">
                             <PlusIcon width={16} height={16} />
-                        </div>
+                        </div>}
                     </div>
-                    {songState.user.name && (
+                    {songState.user.name && !isMinimize && (
                         <div className="h-12 flex items-center gap-2 text-white font-light text-sm">
                             {libraryFilter && (
                                 <button
@@ -83,7 +87,7 @@ const LeftSide = () => {
                                 })}
                         </div>
                     )}
-                    {songState.user.name && (
+                    {songState.user.name && !isMinimize && (
                         <div className="h-8 flex items-center relative">
                             <input
                                 type="checkbox"
@@ -110,6 +114,7 @@ const LeftSide = () => {
                                 <SearchIcon width={16} height={16} className="" />
                             </label>
                             <input
+                                spellCheck={false}
                                 type="text"
                                 placeholder="Search in Your Library"
                                 className="peer/input h-full w-0 peer-checked/checkbox:w-full peer-checked/checkbox:inline-block peer-checked/checkbox:focus peer-checked/checkbox:bg-[#ffffff1a] rounded-md pl-8 py-2 pr-2 bg-transparent outline-none border-none text-sm font-light placeholder:relative placeholder:top-[2px] transition-all duration-300"
@@ -188,6 +193,7 @@ const LeftSide = () => {
                                                 name: 'Liked songs',
                                             }}
                                             owner={savedTracks + ' song' + (savedTracks > 2 ? 's' : '')}
+                                            isMinimize={isMinimize}
                                         />
                                     )}
                                     {library.length > 0 ? (
@@ -202,6 +208,7 @@ const LeftSide = () => {
                                                             songState.isPlaying
                                                         }
                                                         owner={item?.owner}
+                                                        isMinimize={isMinimize}
                                                     />
                                                 </div>
                                             );
@@ -221,7 +228,7 @@ const LeftSide = () => {
                 </div>
                 {!songState.user.name && <LeftsideFooter />}
             </div>
-        </>
+        </div>
     );
 };
 

@@ -10,9 +10,9 @@ const MainLayout = ({ children }) => {
             <SongProvider>
                 <LibraryProvider>
                     <div className="flex justify-between gap-1 h-main-layout">
-                        <div className="w-[280px] shrink-0 flex flex-col gap-2">
+                        {/* <div className="w-[280px] shrink-0 flex flex-col gap-2"> */}
                             <LeftSide />
-                        </div>
+                        {/* </div> */}
                         <div className="resize-bar"></div>
                         <div className="flex-auto bg-[#121212] rounded-md relative overflow-hidden">
                             <RightSide>{children}</RightSide>

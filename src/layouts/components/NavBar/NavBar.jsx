@@ -4,24 +4,23 @@ import { Link, useLocation } from 'react-router-dom';
 import SearchInput from '~/components/SearchInput';
 import { AUTH_URL } from '~/config/spotify';
 import { useSpotifyApi, useSongReducer } from '~/hooks';
+import { createBrowserHistory } from 'history';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     const location = useLocation();
     const [topTracks, setTopTracks] = useState([]);
-    const [history, setHistory] = useState([])
-    const [indexPage, setIndexPage] = useState(0);
+    const [history, setHistory] = useState([]);
+    const [defaultKeyPage, setDefaultKeyPage] = useState(location.key);
+
     const { songState, dispatchSongState } = useSongReducer();
     const spotifyApi = useSpotifyApi();
     console.log('Navbar render');
-
-    console.log(history);
-    console.log(indexPage);
+    const navigate = createBrowserHistory();
 
     useEffect(() => {
-        setHistory([...history, location.pathname])
-        setIndexPage(history.length)
-    }, [location.pathname]) 
+        setHistory([...history, location.key]);
+    }, [location.pathname]);
 
     const handlePlayAndResume = async () => {
         var optionPlay = {};
@@ -131,14 +130,30 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
             className="w-full h-nav bg-transparent transition-all duration-500 py-4 px-6 flex items-center justify-between gap-3 absolute top-0 left-0 z-10"
         >
             <div className="flex gap-2">
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3] text-white opacity-[0.6] cursor-not-allowed"
+                <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3]
+                     text-white ${
+                         navigate.location.key !== defaultKeyPage
+                             ? 'cursor-pointer '
+                             : 'cursor-not-allowed opacity-[0.6]'
+                     }`}
                     onClick={() => {
-                        console.log(window.history)
+                        if (navigate.location.key !== defaultKeyPage) navigate.back();
                     }}
                 >
                     <ChevronLeft width={16} height={16} />
                 </div>
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3] text-white opacity-[0.6] cursor-not-allowed">
+                <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3]
+                 text-white ${
+                     !(location.key == history[history.length - 1])
+                         ? 'cursor-pointer'
+                         : 'cursor-not-allowed opacity-[0.6]'
+                 }`}
+                    onClick={() => {
+                        if (!(location.key == history[history.length - 1])) navigate.forward();
+                    }}
+                >
                     <ChevronRight width={16} height={16} />
                 </div>
             </div>

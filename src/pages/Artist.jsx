@@ -19,7 +19,8 @@ const Artist = () => {
     const context = topTracks.map((track) => {
         return track?.uri;
     });
-    const trackIds = topTracks.map((track) => track?.id);
+
+    console.log("Main color: ", mainColor);
 
     const idx = context.indexOf(songState.uri);
     // ? Nên chỉ để new_queue từ bài click chạy đến cuối không cần lặp lại
@@ -60,6 +61,7 @@ const Artist = () => {
     useEffect(() => {
         const getArtist = async () => {
             const artist = await spotifyApi.getArtist(id);
+            document.title = artist?.body?.name + ' | Spotify';
             const color = await Vibrant.from(artist.body.images[0].url).getPalette();
             setMainColor(color.DarkVibrant.getHex());
             setArtist(artist.body);
@@ -134,7 +136,7 @@ const Artist = () => {
                 </div>
             </div>
             <div
-                className="h-auto bg-gradient-to-b from-[#121212] from-[200px] to-[#121212 to-[200px] opacity-90 sticky top-0"
+                className="h-auto bg-gradient-to-b from-[#121212] from-[200px] to-[#121212] to-[200px] opacity-90 sticky top-0"
                 style={{
                     '--tw-gradient-from': mainColor + '70',
                 }}

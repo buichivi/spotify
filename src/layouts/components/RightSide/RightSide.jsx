@@ -10,23 +10,13 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
 const RightSide = ({ children }) => {
     const location = useLocation();
     const [isHidePlayBtn, setIsHidePlayBtn] = useState(true);
-    const [navColor, setNavColor] = useState('');
-    const [isMainContent, setIsMainContent] = useState(false);
+    const [navColor, setNavColor] = useState('#121212');
     const [content, setContent] = useState('');
     const nav = useRef();
     const mainContentDiv = useRef();
     const spotifyApi = useSpotifyApi();
 
     useEffect(() => {
-        if (
-            location.pathname.includes('/artist') ||
-            location.pathname.includes('/album') ||
-            location.pathname.includes('/playlist')
-        ) {
-            setIsMainContent(true);
-        } else {
-            setIsMainContent(false);
-        }
         const getNavColor = async () => {
             var contentID;
             if (location.pathname.includes('/artist')) {
@@ -45,26 +35,32 @@ const RightSide = ({ children }) => {
                 contentID = location.pathname.split('/playlist/')[1];
                 const playlist = await spotifyApi.getPlaylist(contentID);
                 setContent(playlist.body);
-                const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
-                setNavColor(color.Vibrant.getHex());
+                if (playlist.body.images !== null) {
+                    const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
+                    setNavColor(color.Vibrant.getHex());
+                }
             }
         };
         if (!spotifyApi.error) {
             getNavColor();
         }
-    }, [location, spotifyApi]);
+    }, [location.pathname, spotifyApi]);
 
     const handleScroll = (e) => {
+        console.log('navColor', navColor);
+        const isMainContent =
+            location.pathname.includes('/artist') ||
+            location.pathname.includes('/album') ||
+            location.pathname.includes('/playlist');
         let scrollTop = 0;
         if (isMainContent) {
             scrollTop = Math.max(340, window.outerHeight * 0.4 + 32);
         }
         if (e.currentTarget.scrollTop > scrollTop) {
-            nav.current.style.background = '#121212';
             if (isMainContent) {
                 nav.current.style.background = navColor;
                 setIsHidePlayBtn(false);
-            }
+            } else nav.current.style.background = '#121212';
         } else {
             nav.current.style.background = 'transparent';
             if (isMainContent) {

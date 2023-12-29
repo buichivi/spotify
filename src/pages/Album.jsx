@@ -61,6 +61,7 @@ const Album = () => {
     useEffect(() => {
         const getAlbum = async () => {
             const album = await spotifyApi.getAlbum(id);
+        document.title = album?.body?.name;
             const color = await Vibrant.from(album.body.images[0].url).getPalette();
             setMainColor(color.DarkVibrant.getHex());
             setAlbum(album.body);
@@ -108,11 +109,11 @@ const Album = () => {
         <div className="h-auto w-full -mt-nav">
             <div
                 className="min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] px-6 pb-8 w-full flex items-end
-                bg-gradient-to-b from-[#121212] from-[99%] to-[#121212] to-[99%]
+                bg-gradient-to-b from-[#121212] from-[50%] to-[#121212] to-[50%]
                 "
                 style={{
                     '--tw-gradient-from': mainColor,
-                    '--tw-gradient-to': mainColor + 'B3',
+                    '--tw-gradient-to': mainColor + '80',
                 }}
             >
                 <div className=" flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-md shadow-blur-xl overflow-hidden">

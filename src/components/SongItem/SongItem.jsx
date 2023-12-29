@@ -153,13 +153,13 @@ const SongItem = ({
                     )}
                 </div>
             </div>
-            <div className="flex-1 flex-shrink-0 flex">
+            <div className="flex-1 flex-shrink-0 flex items-center">
                 {!isHideImg && (
                     <div className="w-10 h-10 flex-shrink-0 rounded-md overflow-hidden mr-3">
                         <img className="w-full h-full object-cover" src={trackData?.album?.images[0].url} alt="" />
                     </div>
                 )}
-                <div className="flex flex-col justify-start">
+                <div className="flex flex-col justify-center">
                     <span
                         className="text-base text-white text-climp-1 font-light"
                         style={{

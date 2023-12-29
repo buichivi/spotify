@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSpotifyApi, useSongReducer } from '~/hooks';
 import Vibrant from 'node-vibrant';
-import { ClockIcon, PauseIcon, PlayIcon } from '~/components/Icons';
+import { ClockIcon, MusicIcon, PauseIcon, PlayIcon } from '~/components/Icons';
 import SongItem from '~/components/SongItem';
 import { convertDurationToText } from '~/utils';
 
@@ -16,6 +16,7 @@ const Playlist = () => {
     const totalTime = playlist?.tracks?.items?.reduce((acc, item) => {
         return acc + Number(item?.track?.duration_ms);
     }, 0);
+
 
     // ! Lỗi khi mới tải trang và context_uri = '' và ấn nút play trên trang album
     // ! thì bị lỗi thời gian không reset về 0
@@ -59,11 +60,14 @@ const Playlist = () => {
     useEffect(() => {
         const getPlaylist = async () => {
             const playlist = await spotifyApi.getPlaylist(id);
-            const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
-            setMainColor(color.Vibrant.getHex());
+            document.title = playlist?.body?.name
+            if (playlist.body.images !== null) {
+                const color = await Vibrant.from(playlist.body.images[0].url).getPalette();
+                setMainColor(color.Vibrant.getHex());
+            } else setMainColor('#565656')
             setPlaylist(playlist.body);
             const trackIds = playlist?.body?.tracks?.items?.map((item) => item?.track?.id);
-            getSavedTracks(trackIds);
+            if (trackIds.length) getSavedTracks(trackIds);
         };
 
         const getSavedTracks = async (trackIds = []) => {
@@ -98,19 +102,21 @@ const Playlist = () => {
         <div className="h-auto w-full -mt-nav">
             <div
                 className="min-h-[240px] md:min-h-[340px] max-h-[30vh] md:max-h-[40vh] px-6 pb-8 w-full flex items-end
-                    bg-gradient-to-b from-[#121212] from-[99%] to-[#121212] to-[99%]
+                    bg-gradient-to-b from-[#565656] from-[70%] to-[#2b2b2b] 
                 "
                 style={{
                     '--tw-gradient-from': mainColor,
-                    '--tw-gradient-to': mainColor + '70',
+                    '--tw-gradient-to': mainColor && mainColor + '70',
                 }}
             >
                 <div className=" flex-shrink-0 w-contentImgWidth h-contentImgHeight mr-8 rounded-md shadow-blur-xl overflow-hidden">
-                    <img
-                        src={playlist?.images?.length > 0 ? playlist.images[0].url : ''}
-                        alt=""
-                        className="w-full h-full object-cover"
-                    />
+                    {playlist?.images?.length > 0 ? (
+                        <img src={playlist.images[0].url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-[#7f7f7f] bg-[#121212]">
+                            <MusicIcon width={48} height={48} className="xl:w-[64px] xl:h-[64px]" />
+                        </div>
+                    )}
                 </div>
                 <div>
                     <div className="flex items-center font-light text-sm capitalize">{playlist?.type}</div>
@@ -132,60 +138,64 @@ const Playlist = () => {
                 </div>
             </div>
             <div
-                className="h-auto bg-gradient-to-b from-[#121212] from-[250px] to-[#121212 to-[250px] opacity-90 sticky top-0"
+                className="h-auto bg-gradient-to-b from-[#2b2b2b] from-[250px] to-[#121212] to-[250px] opacity-90 sticky top-0"
                 style={{
                     '--tw-gradient-from': mainColor + '60',
                 }}
             >
                 <div className="h-auto p-[24px] flex items-center relative">
-                    <button className="w-[56px] h-[56px] bg-[#1db954] text-black overflow-hidden rounded-full flex items-center justify-center hover:scale-105 transition mr-8">
-                        <div
-                            className="p-[100%]"
-                            onClick={handlePlayAndResume}
-                            style={{
-                                display:
-                                    songState?.context?.context_uri == playlist?.uri &&
-                                    songState?.isPlaying == true &&
-                                    'none',
-                            }}
-                        >
-                            <PlayIcon />
-                        </div>
-                        {songState?.context?.context_uri == playlist?.uri && songState?.isPlaying == true && (
-                            <div className="p-[100%]" onClick={handlePause}>
-                                <PauseIcon />
+                    {playlist?.tracks?.total > 0 && (
+                        <button className="w-[56px] h-[56px] bg-[#1db954] text-black overflow-hidden rounded-full flex items-center justify-center hover:scale-105 transition mr-8">
+                            <div
+                                className="p-[100%]"
+                                onClick={handlePlayAndResume}
+                                style={{
+                                    display:
+                                        songState?.context?.context_uri == playlist?.uri &&
+                                        songState?.isPlaying == true &&
+                                        'none',
+                                }}
+                            >
+                                <PlayIcon />
                             </div>
-                        )}
-                    </button>
-                </div>
-                <div className="px-6">
-                    <div className="h-[36px] flex items-center justify-between gap-4 px-4 mb-6 border-b-[1px] border-[#ffffff1a] text-[#a7a7a7]">
-                        <span className="text-sm  ml-[4px]">#</span>
-                        <span className="flex-1 text-sm font-light">Title</span>
-                        <span className="hidden md:inline-block flex-1 text-sm font-light">Album</span>
-                        <span className="hidden xl:inline-block flex-1 text-sm font-light">Date added</span>
-                        <span className="w-[120px] flex flex-shrink-0 items-center justify-end">
-                            <ClockIcon width={16} height={16} />
-                        </span>
-                    </div>
-                    <div className="w-full">
-                        {playlist?.tracks?.items?.map((item, index) => {
-                            return (
-                                <div key={index}>
-                                    <SongItem
-                                        orderNum={index + 1}
-                                        trackData={item?.track}
-                                        context={playlist?.uri}
-                                        playlistUri={playlist?.uri}
-                                        dateAdded={item?.added_at}
-                                        isPlaylist
-                                        isSaved={savedTracks[index]}
-                                    />
+                            {songState?.context?.context_uri == playlist?.uri && songState?.isPlaying == true && (
+                                <div className="p-[100%]" onClick={handlePause}>
+                                    <PauseIcon />
                                 </div>
-                            );
-                        })}
-                    </div>
+                            )}
+                        </button>
+                    )}
                 </div>
+                {playlist?.tracks?.total > 0 && (
+                    <div className="px-6">
+                        <div className="h-[36px] flex items-center justify-between gap-4 px-4 mb-6 border-b-[1px] border-[#ffffff1a] text-[#a7a7a7]">
+                            <span className="text-sm  ml-[4px]">#</span>
+                            <span className="flex-1 text-sm font-light">Title</span>
+                            <span className="hidden md:inline-block flex-1 text-sm font-light">Album</span>
+                            <span className="hidden xl:inline-block flex-1 text-sm font-light">Date added</span>
+                            <span className="w-[120px] flex flex-shrink-0 items-center justify-end">
+                                <ClockIcon width={16} height={16} />
+                            </span>
+                        </div>
+                        <div className="w-full">
+                            {playlist?.tracks?.items?.map((item, index) => {
+                                return (
+                                    <div key={index}>
+                                        <SongItem
+                                            orderNum={index + 1}
+                                            trackData={item?.track}
+                                            context={playlist?.uri}
+                                            playlistUri={playlist?.uri}
+                                            dateAdded={item?.added_at}
+                                            isPlaylist
+                                            isSaved={savedTracks[index]}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

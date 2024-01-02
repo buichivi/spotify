@@ -9,6 +9,8 @@ const HistorySearch =  ({ className = '' }) => {
             </div>
             <div className="grid grid-cols-5 2xl:grid-cols-8 gap-category-gap">
                 <HistorySearchItem name="The Weeknd" type="Artist"/>
+                <HistorySearchItem name="The Weeknd" type="Artist"/>
+                <HistorySearchItem name="The Weeknd" type="Artist"/>
                 <HistorySearchItem />
             </div>
         </section>

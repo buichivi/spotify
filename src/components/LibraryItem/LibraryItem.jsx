@@ -23,7 +23,9 @@ const LibraryItem = ({ data = {}, isActive = false, isPlaying = false, owner = '
     return (
         <Link
             ref={librayItem}
-            className={`w-full h-[64px] p-2 bg-transparent cursor-pointer rounded-md flex gap-3 items-center ${isMinimize ? 'justify-center' : 'justify-between'}`}
+            className={`${
+                isMinimize ? 'w-[64px] justify-center -ml-1' : 'w-full justify-between'
+            } p-2 h-[64px] bg-transparent cursor-pointer rounded-md flex gap-3 items-center`}
             to={`/${data?.type}/${data?.id}`}
             style={{
                 backgroundColor: id == data?.id && '#232323',

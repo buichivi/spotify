@@ -19,7 +19,6 @@ const Category = ({ data = [], title, type = 'playlist', to, className }) => {
                 lg:[&>*:nth-child(n+5)]:hidden xl:[&>*:nth-child(n+6)]:inline-block
                 xl:[&>*:nth-child(n+7)]:hidden 2xl:[&>*:nth-child(n+7)]:inline-block
                 2xl:[&>*:nth-child(n+9)]:hidden 
-                3xl:[&>*:nth-child(n+9)]:inline-block 
             "
             >
                 {data.map((item, index) => {

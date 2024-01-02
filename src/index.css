@@ -1,5 +1,6 @@
 @import 'normalize.css';
 @import 'overlayscrollbars/overlayscrollbars.css';
+@import 'tippy.js/dist/tippy.css';
 
 @tailwind base;
 @tailwind components;

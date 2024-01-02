@@ -1,6 +1,8 @@
 import { forwardRef, memo, useEffect, useState } from 'react';
-import { ArrowDownIcon, BellIcon, ChevronLeft, ChevronRight, PauseIcon, PlayIcon } from '~/components/Icons';
 import { Link, useLocation } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
+
+import { ArrowDownIcon, BellIcon, ChevronLeft, ChevronRight, PauseIcon, PlayIcon } from '~/components/Icons';
 import SearchInput from '~/components/SearchInput';
 import { AUTH_URL } from '~/config/spotify';
 import { useSpotifyApi, useSongReducer } from '~/hooks';
@@ -18,8 +20,15 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
     console.log('Navbar render');
     const navigate = createBrowserHistory();
 
+    console.log(history);
+
     useEffect(() => {
-        setHistory([...history, location.key]);
+        setHistory((prevHistory) => {
+            if (prevHistory.includes(location.key)) {
+                return [...prevHistory];
+            }
+            return [...prevHistory, location.key];
+        });
     }, [location.pathname]);
 
     const handlePlayAndResume = async () => {
@@ -130,32 +139,37 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
             className="w-full h-nav bg-transparent transition-all duration-500 py-4 px-6 flex items-center justify-between gap-3 absolute top-0 left-0 z-10"
         >
             <div className="flex gap-2">
-                <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3]
-                     text-white ${
-                         navigate.location.key !== defaultKeyPage
-                             ? 'cursor-pointer '
-                             : 'cursor-not-allowed opacity-[0.6]'
-                     }`}
-                    onClick={() => {
-                        if (navigate.location.key !== defaultKeyPage) navigate.back();
-                    }}
-                >
-                    <ChevronLeft width={16} height={16} />
-                </div>
-                <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3]
+                <Tippy content="Go back" disabled={navigate.location.key == defaultKeyPage}>
+                    <div
+                        className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#000000b3]
+                         text-white ${
+                             navigate.location.key !== defaultKeyPage
+                                 ? 'cursor-pointer '
+                                 : 'cursor-not-allowed opacity-[0.6]'
+                         }`}
+                        onClick={() => {
+                            if (navigate.location.key !== defaultKeyPage) navigate.back();
+                        }}
+                    >
+                        <ChevronLeft width={16} height={16} />
+                    </div>
+                </Tippy>
+                <Tippy content="Go forward" disabled={location.key == history[history.length - 1]}>
+                    <div
+                        className={`w-8 h-8 hidden lg:flex items-center justify-center rounded-full bg-[#000000b3]
                  text-white ${
                      !(location.key == history[history.length - 1])
                          ? 'cursor-pointer'
                          : 'cursor-not-allowed opacity-[0.6]'
                  }`}
-                    onClick={() => {
-                        if (!(location.key == history[history.length - 1])) navigate.forward();
-                    }}
-                >
-                    <ChevronRight width={16} height={16} />
-                </div>
+                        onClick={() => {
+                            console.log(location.key, history[history.length - 1]);
+                            if (!(location.key == history[history.length - 1])) navigate.forward();
+                        }}
+                    >
+                        <ChevronRight width={16} height={16} />
+                    </div>
+                </Tippy>
             </div>
             {(location.pathname.includes('/artist') ||
                 location.pathname.includes('/album') ||
@@ -261,25 +275,27 @@ const NavBar = ({ isHide = true, currentContent = {} }, ref) => {
                     >
                         <BellIcon className="group-hover:font-bold text-white" />
                     </Link>
-                    <button
-                        onClick={() => {
-                            window.localStorage.removeItem('access_token');
-                            window.localStorage.removeItem('refresh_token');
-                            window.location = origin;
-                        }}
-                        className="flex flex-shrink-0 items-center gap-2 justify-center cursor-pointer w-9 md:w-auto md:py-1 md:px-3 h-9 rounded-full transition
-                         bg-[#0000008a] md:bg-transparent
-                        "
-                    >
-                        <img
-                            src={songState.user.imageUrl}
-                            width={28}
-                            height={28}
-                            alt={songState.user.name}
-                            className="rounded-full"
-                        />
-                        <span className="hidden md:inline-block">{songState.user.name}</span>
-                    </button>
+                    <Tippy content={songState.user.name} className='md:hidden'>
+                        <button
+                            onClick={() => {
+                                window.localStorage.removeItem('access_token');
+                                window.localStorage.removeItem('refresh_token');
+                                window.location = origin;
+                            }}
+                            className="flex flex-shrink-0 items-center gap-2 justify-center cursor-pointer w-9 md:w-auto md:py-1 md:px-3 h-9 rounded-full transition
+                             bg-[#0000008a] md:bg-transparent
+                            "
+                        >
+                            <img
+                                src={songState.user.imageUrl}
+                                width={28}
+                                height={28}
+                                alt={songState.user.name}
+                                className="rounded-full"
+                            />
+                            <span className="hidden md:inline-block">{songState.user.name}</span>
+                        </button>
+                    </Tippy>
                 </div>
             )}
         </nav>
